@@ -193,8 +193,9 @@
     /* ── Card Grid ── */
     .card-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 360px));
       gap: 24px;
+      justify-content: center;
     }
 
     .qcard-wrap {
@@ -210,7 +211,7 @@
     .qcard-inner {
       position: relative;
       width: 100%;
-      min-height: 320px;
+      min-height: 460px;
       transform-style: preserve-3d;
       transition: transform .65s cubic-bezier(.4, 0, .2, 1);
     }
@@ -234,7 +235,8 @@
       border-color: var(--accent);
       box-shadow: 0 4px 14px rgba(0, 0, 0, .06);
     }
-    .card-front { cursor: pointer; }
+    .card-front,
+    .card-back  { cursor: pointer; }
     .card-back  { transform: rotateY(180deg); }
 
     /* ── Front Face ── */
@@ -309,23 +311,14 @@
     .question::-webkit-scrollbar-thumb,
     .back-answer::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 3px; }
 
-    .flip-back-btn {
+    .flip-hint-back {
       margin-top: 14px;
-      padding: 7px 16px;
-      align-self: flex-start;
-      background: var(--accent-light);
-      border: 1px solid var(--accent);
-      color: var(--accent-dark);
-      border-radius: 8px;
-      cursor: pointer;
-      font-family: system-ui, sans-serif;
+      padding-top: 12px;
+      border-top: 1px solid var(--accent-light);
+      text-align: left;
+      color: var(--muted);
       font-size: .82rem;
-      font-weight: 600;
-      transition: background .15s, color .15s;
-    }
-    .flip-back-btn:hover {
-      background: var(--accent);
-      color: #ffffff;
+      font-family: system-ui, sans-serif;
     }
 
     /* ── Score Row ── */
@@ -513,15 +506,14 @@
           </div>
           <div class="card-face card-back">
             <div class="back-answer" data-tex>${(q.answer || '').replace(/\n/g, '<br>')}</div>
-            <button class="flip-back-btn" type="button">← 返回题目</button>
+            <div class="flip-hint-back">← 点击卡片翻回</div>
           </div>
         </div>
       `;
 
-      const inner   = card.querySelector('.qcard-inner');
-      const front   = card.querySelector('.card-front');
-      const back    = card.querySelector('.card-back');
-      const backBtn = card.querySelector('.flip-back-btn');
+      const inner = card.querySelector('.qcard-inner');
+      const front = card.querySelector('.card-front');
+      const back  = card.querySelector('.card-back');
 
       function renderBackIfNeeded() {
         if (!back.dataset.rendered && window.renderMathInElement) {
@@ -536,12 +528,18 @@
         }
       }
 
+      function isTextSelected() {
+        const sel = window.getSelection && window.getSelection();
+        return !!(sel && sel.toString().length > 0);
+      }
+
       front.addEventListener('click', () => {
+        if (isTextSelected()) return;
         renderBackIfNeeded();
         inner.classList.add('flipped');
       });
-      backBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
+      back.addEventListener('click', () => {
+        if (isTextSelected()) return;
         inner.classList.remove('flipped');
       });
 
