@@ -321,6 +321,35 @@
       font-family: system-ui, sans-serif;
     }
 
+    /* ── 次级筛选条（小节） ── */
+    .filter-chips-secondary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: -14px;
+      margin-bottom: 24px;
+      justify-content: center;
+    }
+    .filter-chips-secondary:empty {
+      display: none;
+    }
+    .filter-chips-secondary .chip {
+      font-size: .76rem;
+      padding: 4px 12px;
+      background: transparent;
+      border: 1px solid var(--accent-light);
+      color: var(--accent);
+    }
+    .filter-chips-secondary .chip:hover {
+      background: var(--accent-light);
+      border-color: var(--accent);
+    }
+    .filter-chips-secondary .chip.active {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
     /* ── Chapter / Section Groups (教材模式) ── */
     .chapter-group {
       margin-bottom: 44px;
@@ -431,6 +460,7 @@
   <main>
     <div class="mode-tabs" id="mode-tabs"></div>
     <div class="filter-chips" id="filter-chips"></div>
+    <div class="filter-chips-secondary" id="section-chips"></div>
     <div id="card-grid"></div>
   </main>
 
@@ -488,37 +518,64 @@
       const modeItems = currentMode
         ? mathQuestionBank.filter(q => q.source === currentMode)
         : mathQuestionBank;
-      const box = document.getElementById('filter-chips');
-      box.innerHTML = '';
+      const primaryBox   = document.getElementById('filter-chips');
+      const secondaryBox = document.getElementById('section-chips');
+      primaryBox.innerHTML = '';
+      secondaryBox.innerHTML = '';
 
-      function addChip(value, label) {
+      function addChip(box, value, label, active) {
         const btn = document.createElement('button');
-        btn.className = 'chip' + (currentFilter === value ? ' active' : '');
+        btn.className = 'chip' + (active ? ' active' : '');
         btn.textContent = label;
         btn.onclick = () => { currentFilter = value; render(); };
         box.appendChild(btn);
       }
 
-      addChip('ALL', '全部');
-
       if (currentMode === '教材模式') {
-        // 章节芯片
+        // 当前选中的章节（ALL / 章 / 节 都要落到 "selectedChapter"）
+        let selectedChapter = null;
+        if (currentFilter !== 'ALL') {
+          const m = currentFilter.match(/^(ma-c\d+)/);
+          selectedChapter = m ? m[1] : null;
+        }
+
+        // 第一层：章节
         const chapters = new Set();
         modeItems.forEach(q => {
           const m = q.kp_id && q.kp_id.match(/^(ma-c\d+)/);
           if (m) chapters.add(m[1]);
         });
-        const sorted = [...chapters].sort(byNumericSuffix);
-        sorted.forEach(cid => {
+        const sortedChapters = [...chapters].sort(byNumericSuffix);
+
+        addChip(primaryBox, 'ALL', '全部', currentFilter === 'ALL');
+        sortedChapters.forEach(cid => {
           const node = findNode(cid);
           const short = node ? (node.title.split(/\s+/)[0] || node.title) : cid;
-          addChip(cid, short);
+          addChip(primaryBox, cid, short, selectedChapter === cid);
         });
+
+        // 第二层：小节（仅当某章已选中时渲染）
+        if (selectedChapter) {
+          const sections = new Set();
+          modeItems.forEach(q => {
+            const m = q.kp_id && q.kp_id.match(/^(ma-c\d+)-(s\d+)/);
+            if (m && m[1] === selectedChapter) sections.add(`${m[1]}-${m[2]}`);
+          });
+          const sortedSections = [...sections].sort(byNumericSuffix);
+
+          addChip(secondaryBox, selectedChapter, '全部小节', currentFilter === selectedChapter);
+          sortedSections.forEach(sid => {
+            const node = findNode(sid);
+            const short = node ? (node.title.split(/\s+/)[0] || node.title) : sid;
+            addChip(secondaryBox, sid, short, currentFilter === sid);
+          });
+        }
       } else {
-        // 话题标签芯片（真题模式）
+        // 真题模式：话题标签（单层）
         const tagSet = new Set();
         modeItems.forEach(q => (q.tags || []).forEach(t => tagSet.add(t)));
-        [...tagSet].forEach(tag => addChip(tag, tag));
+        addChip(primaryBox, 'ALL', '全部', currentFilter === 'ALL');
+        [...tagSet].forEach(tag => addChip(primaryBox, tag, tag, currentFilter === tag));
       }
     }
 
