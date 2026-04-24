@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>极客复习中枢 | 诗钰校长</title>
+    <style>
+        body { margin: 0; padding: 0; background-color: #0d1117; color: #c9d1d9; font-family: 'Courier New', Courier, monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+        .container { text-align: center; max-width: 800px; padding: 20px; }
+        h1 { color: #58a6ff; text-shadow: 0 0 10px rgba(88, 166, 255, 0.5); letter-spacing: 2px; }
+        .subtitle { color: #8b949e; margin-bottom: 40px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; text-decoration: none; color: inherit; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; }
+        .card:hover { border-color: #58a6ff; box-shadow: 0 0 15px rgba(88, 166, 255, 0.2); transform: translateY(-5px); }
+        .card h2 { color: #7ee787; margin: 10px 0; font-size: 1.2rem; }
+        .card p { font-size: 0.9rem; color: #8b949e; }
+        .disabled { border-color: #484f58; opacity: 0.6; cursor: not-allowed; }
+        .disabled:hover { transform: none; border-color: #484f58; box-shadow: none; }
+        .disabled h2 { color: #8b949e; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>[ SYSTEM.BOOT ] 诗钰校长的复习中枢</h1>
+        <div class="subtitle">Data-Driven Learning Engine v2.0</div>
+
+        <div class="grid">
+            <a href="english.html" class="card">
+                <h2>引擎 A: 英语靶场</h2>
+                <p>每日 21 词动态流转 & 真题演练</p>
+            </a>
+            <a href="math.html" class="card">
+                <h2>引擎 B: 数学图谱</h2>
+                <p>数学分析概念默写 & 定理推演</p>
+            </a>
+            <a href="tech.html" class="card disabled">
+                <h2>引擎 C: 极客安全栈</h2>
+                <p>Python 自动化与防御演练 (建设中)</p>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

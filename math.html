@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>数学系考研 · 知识体系</title>
+
+  <!-- KaTeX 渲染引擎 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+          onload="katexReady = true; tryInit()"></script>
+
+  <!-- 数据引擎 -->
+  <script src="math_data.js"></script>
+
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:          #f5f0e8;
+      --sidebar-bg:  #ffffff;
+      --sidebar-w:   300px;
+      --nav-h:       42px;
+      --header-h:    58px;
+      --accent:      #5c7a6e;
+      --accent-dark: #3d5f55;
+      --accent-light:#e8f0ec;
+      --border:      #e8e0d0;
+      --text:        #2c2c2c;
+      --text-muted:  #7a8591;
+      --ch-clr:      #5c7a6e;   /* chapter */
+      --sec-clr:     #4a6fa5;   /* section */
+      --con-clr:     #7c5cbf;   /* concept */
+      --thm-clr:     #b45309;   /* theorem */
+    }
+
+    html, body { height: 100%; }
+    body {
+      font-family: 'Georgia', serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ── Global Nav ── */
+    .global-nav {
+      height: var(--nav-h);
+      background: #1e2832;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      flex-shrink: 0;
+      gap: 12px;
+    }
+    .global-nav-brand {
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.5);
+      font-family: system-ui, sans-serif;
+      white-space: nowrap;
+    }
+    .global-nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .global-nav-btn {
+      font-size: .72rem;
+      font-weight: 700;
+      font-family: system-ui, sans-serif;
+      padding: 5px 13px;
+      border-radius: 6px;
+      text-decoration: none;
+      border: 1.5px solid transparent;
+      transition: background .15s, border-color .15s, color .15s;
+      white-space: nowrap;
+      color: rgba(255,255,255,.7);
+      background: transparent;
+      border-color: rgba(255,255,255,.12);
+    }
+    .global-nav-btn:hover {
+      background: rgba(255,255,255,.1);
+      color: #fff;
+      border-color: rgba(255,255,255,.25);
+    }
+    .global-nav-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* ── Header ── */
+    header {
+      height: var(--header-h);
+      background: var(--accent);
+      color: #fff;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,.18);
+      flex-shrink: 0;
+      position: sticky;
+      top: var(--nav-h);
+      z-index: 100;
+    }
+    header h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      line-height: 1.2;
+    }
+    header p {
+      font-size: .72rem;
+      color: rgba(255,255,255,.65);
+      margin-top: 2px;
+      font-family: system-ui, sans-serif;
+    }
+    .header-badge {
+      font-size: .65rem;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 20px;
+      padding: 4px 12px;
+      letter-spacing: .06em;
+      font-family: system-ui, sans-serif;
+      color: rgba(255,255,255,.9);
+    }
+
+    /* ── Layout shell ── */
+    .app-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      height: calc(100vh - var(--nav-h) - var(--header-h));
+    }
+
+    /* ══ SIDEBAR ══════════════════════════════ */
+    #sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      background: var(--sidebar-bg);
+      border-right: 1.5px solid var(--border);
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    #sidebar::-webkit-scrollbar { width: 5px; }
+    #sidebar::-webkit-scrollbar-track { background: transparent; }
+    #sidebar::-webkit-scrollbar-thumb { background: #d1cdc5; border-radius: 4px; }
+    #sidebar::-webkit-scrollbar-thumb:hover { background: #b8b4ac; }
+
+    .sidebar-header {
+      padding: 16px 18px 10px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--sidebar-bg);
+      z-index: 10;
+    }
+    .sidebar-header h2 {
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-family: system-ui, sans-serif;
+    }
+    .sidebar-search {
+      margin-top: 9px;
+      position: relative;
+    }
+    .sidebar-search input {
+      width: 100%;
+      padding: 7px 12px 7px 32px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: .78rem;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      font-family: system-ui, sans-serif;
+      transition: border-color .15s;
+    }
+    .sidebar-search input:focus { border-color: var(--accent); }
+    .sidebar-search .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: .78rem;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Tree */
+    #tree-root { padding: 10px 0 20px; }
+
+    .tree-ul { list-style: none; }
+    .tree-ul.child-ul { display: none; overflow: hidden; }
+    .tree-ul.child-ul.open { display: block; }
+
+    .tree-item { position: relative; }
+
+    .tree-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px 7px 12px;
+      cursor: pointer;
+      border-radius: 0;
+      transition: background .12s;
+      user-select: none;
+      line-height: 1.4;
+      text-decoration: none;
+      color: inherit;
+    }
+    .tree-row:hover { background: #f5f0e8; }
+    .tree-row.active {
+      background: var(--accent-light);
+      color: var(--accent-dark);
+      font-weight: 700;
+    }
+
+    /* indent levels */
+    .tree-row[data-depth="0"] { padding-left: 14px; }
+    .tree-row[data-depth="1"] { padding-left: 28px; }
+    .tree-row[data-depth="2"] { padding-left: 42px; }
+    .tree-row[data-depth="3"] { padding-left: 56px; }
+    .tree-row[data-depth="4"] { padding-left: 70px; }
+
+    .tree-icon { font-size: .85rem; flex-shrink: 0; }
+    .tree-caret {
+      font-size: .55rem;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      transition: transform .2s;
+      margin-left: auto;
+    }
+    .tree-row.open .tree-caret { transform: rotate(90deg); }
+    .tree-label {
+      font-size: .8rem;
+      font-family: system-ui, sans-serif;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* type-specific accent colors */
+    .tree-row[data-type="chapter"] .tree-label { font-weight: 700; color: var(--ch-clr); }
+    .tree-row[data-type="section"]  .tree-label { font-weight: 600; color: var(--sec-clr); }
+    .tree-row[data-type="concept"]  .tree-label { color: var(--con-clr); }
+    .tree-row[data-type="theorem"]  .tree-label { color: var(--thm-clr); }
+
+    /* ══ MAIN CONTENT ══════════════════════════ */
+    #main {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 36px 48px 60px;
+      min-width: 0;
+    }
+    #main::-webkit-scrollbar { width: 6px; }
+    #main::-webkit-scrollbar-track { background: transparent; }
+    #main::-webkit-scrollbar-thumb { background: #cdc8bf; border-radius: 4px; }
+
+    /* Welcome / empty state */
+    #welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 60%;
+      text-align: center;
+      opacity: .45;
+      pointer-events: none;
+    }
+    #welcome .welcome-icon { font-size: 3.5rem; margin-bottom: 16px; }
+    #welcome h2 { font-size: 1.15rem; font-weight: 700; color: var(--text); }
+    #welcome p { font-size: .85rem; color: var(--text-muted); margin-top: 6px; font-family: system-ui, sans-serif; }
+
+    /* Content area */
+    #content-area { display: none; }
+    #content-area.visible { display: block; }
+
+    /* Breadcrumb */
+    #breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .72rem;
+      font-family: system-ui, sans-serif;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    #breadcrumb span { color: var(--text-muted); }
+    #breadcrumb .bc-sep { color: #c4bdb4; }
+
+    /* Title */
+    #content-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.25;
+      margin-bottom: 8px;
+      letter-spacing: -.02em;
+    }
+    #content-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 28px;
+      font-family: system-ui, sans-serif;
+    }
+    #content-type-badge.concept { background: #ede9f8; color: var(--con-clr); }
+    #content-type-badge.theorem { background: #fef3c7; color: var(--thm-clr); }
+    #content-type-badge.section { background: #dbeafe; color: var(--sec-clr); }
+    #content-type-badge.chapter { background: var(--accent-light); color: var(--accent-dark); }
+
+    /* Divider */
+    .content-divider {
+      border: none;
+      border-top: 1.5px solid var(--border);
+      margin-bottom: 28px;
+    }
+
+    /* Rendered markdown-like content */
+    #content-body {
+      font-size: .95rem;
+      line-height: 1.9;
+      color: #1e2832;
+      max-width: 780px;
+    }
+    #content-body h2 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--accent-dark);
+      margin: 32px 0 10px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--accent-light);
+    }
+    #content-body h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #374151;
+      margin: 22px 0 8px;
+    }
+    #content-body p { margin-bottom: 12px; }
+    #content-body ul, #content-body ol {
+      margin: 10px 0 14px 22px;
+    }
+    #content-body li { margin-bottom: 5px; }
+    #content-body strong { color: #1a202c; font-weight: 700; }
+    #content-body em { font-style: italic; color: #555; }
+
+    /* Block math */
+    #content-body .katex-display {
+      margin: 22px 0 !important;
+      padding: 18px 24px;
+      background: #fafaf8;
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      overflow-x: auto;
+    }
+
+    /* Tables */
+    #content-body table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 18px 0;
+      font-size: .85rem;
+      font-family: system-ui, sans-serif;
+    }
+    #content-body th {
+      background: var(--accent-light);
+      color: var(--accent-dark);
+      font-weight: 700;
+      padding: 9px 14px;
+      text-align: left;
+      border: 1px solid #d1ece0;
+    }
+    #content-body td {
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      vertical-align: top;
+    }
+    #content-body tr:nth-child(even) td { background: #faf8f4; }
+
+    /* Code */
+    #content-body code {
+      font-family: 'Menlo', 'Consolas', monospace;
+      font-size: .82rem;
+      background: #f0ede6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #9b1c1c;
+    }
+
+    /* Blockquote */
+    #content-body blockquote {
+      margin: 16px 0;
+      padding: 12px 18px;
+      background: #fffbeb;
+      border-left: 3px solid #f59e0b;
+      border-radius: 0 6px 6px 0;
+      color: #78350f;
+      font-style: italic;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .anim-in { animation: fadeSlideIn .25s ease both; }
+
+    /* ── Mobile sidebar toggle ── */
+    @media (max-width: 768px) {
+      :root { --sidebar-w: 260px; }
+      #sidebar {
+        position: fixed;
+        top: calc(var(--nav-h) + var(--header-h));
+        left: 0;
+        bottom: 0;
+        z-index: 200;
+        transform: translateX(-100%);
+        transition: transform .25s ease;
+        box-shadow: 4px 0 16px rgba(0,0,0,.12);
+      }
+      #sidebar.mobile-open { transform: translateX(0); }
+      #main { padding: 24px 20px 48px; }
+      #mobile-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        border: 1.5px solid rgba(255,255,255,.3);
+        background: rgba(255,255,255,.1);
+        cursor: pointer;
+        font-size: 1.1rem;
+        color: #fff;
+        flex-shrink: 0;
+      }
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: calc(var(--nav-h) + var(--header-h)) 0 0 0;
+        background: rgba(0,0,0,.35);
+        z-index: 190;
+      }
+      .sidebar-overlay.show { display: block; }
+    }
+    @media (min-width: 769px) {
+      #mobile-toggle { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ GLOBAL NAV ════════════════════════════════════════ -->
+<nav class="global-nav" aria-label="全局导航">
+  <span class="global-nav-brand">⊕ 数学复习中枢</span>
+  <div class="global-nav-links">
+    <a href="math.html"  class="global-nav-btn active">📖 知识图谱</a>
+    <a href="index.html" class="global-nav-btn">🎯 刷题靶场</a>
+  </div>
+</nav>
+
+<!-- ═══ HEADER ═══════════════════════════════════════════ -->
+<header>
+  <div>
+    <h1>数学系考研</h1>
+    <p>数学分析 &amp; 高等代数 — 知识体系</p>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <span class="header-badge">📐 KaTeX · LaTeX 渲染</span>
+    <button id="mobile-toggle" onclick="toggleSidebar()" title="目录">☰</button>
+  </div>
+</header>
+
+<!-- ═══ BODY ══════════════════════════════════════════════ -->
+<div class="app-body">
+
+  <!-- Sidebar overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+  <!-- ── SIDEBAR ──────────────────────────────────── -->
+  <nav id="sidebar" aria-label="知识目录">
+    <div class="sidebar-header">
+      <h2>📚 知识目录</h2>
+      <div class="sidebar-search">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="搜索知识点…" oninput="handleSearch(this.value)" />
+      </div>
+    </div>
+    <ul id="tree-root" class="tree-ul" role="tree"></ul>
+  </nav>
+
+  <!-- ── MAIN CONTENT ─────────────────────────────── -->
+  <main id="main" role="main">
+
+    <!-- Welcome state -->
+    <div id="welcome">
+      <div class="welcome-icon">📐</div>
+      <h2>请从左侧目录选择知识点</h2>
+      <p>点击任意叶节点（💡概念 / ⭐定理）<br>即可在此展示完整内容与 LaTeX 公式</p>
+    </div>
+
+    <!-- Content area -->
+    <div id="content-area">
+      <nav id="breadcrumb" aria-label="面包屑"></nav>
+      <h1 id="content-title"></h1>
+      <div id="content-type-badge"></div>
+      <hr class="content-divider" />
+      <div id="content-body"></div>
+    </div>
+
+  </main>
+</div>
+
+
+<script>
+/* ════════════════════════════════════════════════════════
+   全局状态
+   ════════════════════════════════════════════════════════ */
+let katexReady = false;
+let dataReady  = false;
+let activeRow  = null;   // 当前高亮的 tree-row 元素
+
+// 节点图标映射
+const TYPE_ICON = {
+  chapter : '📖',
+  section : '🔖',
+  concept : '💡',
+  theorem : '⭐',
+};
+
+// 面包屑缓存：id → 祖先路径
+const ancestorMap = new Map();
+
+/* ════════════════════════════════════════════════════════
+   初始化入口
+   ════════════════════════════════════════════════════════ */
+function tryInit() {
+  // KaTeX auto-render 脚本的 onload 触发后检查数据是否就绪
+  if (typeof mathKnowledgeTree !== 'undefined') {
+    dataReady = true;
+  }
+  if (katexReady && dataReady) {
+    buildTree();
+  }
+}
+
+// 数据脚本同步加载完成后再尝试初始化
+window.addEventListener('DOMContentLoaded', () => {
+  if (typeof mathKnowledgeTree !== 'undefined') {
+    dataReady = true;
+  }
+  if (katexReady && dataReady) {
+    buildTree();
+  } else if (dataReady && !katexReady) {
+    // KaTeX 还在加载，先等 onload；但如果 2s 后仍未触发则直接建树
+    setTimeout(() => { if (!katexReady) { katexReady = true; buildTree(); } }, 2000);
+  }
+});
+
+/* ════════════════════════════════════════════════════════
+   目录树构建
+   ════════════════════════════════════════════════════════ */
+function buildTree() {
+  const root = document.getElementById('tree-root');
+  if (!root || root.children.length > 0) return; // 防止重复构建
+
+  buildAncestorMap(mathKnowledgeTree, []);
+  mathKnowledgeTree.forEach(node => {
+    root.appendChild(createTreeItem(node, 0));
+  });
+}
+
+// 递归建立 id → 祖先标题路径 的映射
+function buildAncestorMap(nodes, ancestors) {
+  nodes.forEach(node => {
+    ancestorMap.set(node.id, [...ancestors, node.title]);
+    if (node.children) {
+      buildAncestorMap(node.children, [...ancestors, node.title]);
+    }
+  });
+}
+
+// 递归创建 <li> 节点
+function createTreeItem(node, depth) {
+  const li = document.createElement('li');
+  li.className = 'tree-item';
+  li.setAttribute('role', 'treeitem');
+
+  const hasChildren = node.children && node.children.length > 0;
+  const hasContent  = !!node.content;
+  const icon = TYPE_ICON[node.type] || '📄';
+
+  // Row element
+  const row = document.createElement('div');
+  row.className = 'tree-row';
+  row.setAttribute('data-depth', depth);
+  row.setAttribute('data-type', node.type);
+  row.setAttribute('data-id', node.id);
+  row.setAttribute('tabindex', '0');
+  row.setAttribute('role', hasChildren ? 'button' : 'menuitem');
+  row.innerHTML = `
+    <span class="tree-icon" aria-hidden="true">${icon}</span>
+    <span class="tree-label">${node.title}</span>
+    ${hasChildren ? '<span class="tree-caret" aria-hidden="true">▶</span>' : ''}
+  `;
+
+  // Children UL
+  let childUl = null;
+  if (hasChildren) {
+    childUl = document.createElement('ul');
+    childUl.className = 'tree-ul child-ul';
+    childUl.setAttribute('role', 'group');
+    node.children.forEach(child => {
+      childUl.appendChild(createTreeItem(child, depth + 1));
+    });
+    li.appendChild(row);
+    li.appendChild(childUl);
+  } else {
+    li.appendChild(row);
+  }
+
+  // Click handler
+  row.addEventListener('click', (e) => {
+    e.stopPropagation();
+
+    if (hasChildren) {
+      // Toggle accordion
+      const isOpen = childUl.classList.contains('open');
+      childUl.classList.toggle('open', !isOpen);
+      row.classList.toggle('open', !isOpen);
+    }
+
+    if (hasContent) {
+      renderContent(node);
+      setActiveRow(row);
+      // Auto-close sidebar on mobile
+      if (window.innerWidth <= 768) toggleSidebar(false);
+    }
+  });
+
+  // Keyboard: Enter / Space
+  row.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      row.click();
+    }
+  });
+
+  return li;
+}
+
+/* ════════════════════════════════════════════════════════
+   内容渲染
+   ════════════════════════════════════════════════════════ */
+function renderContent(node) {
+  const welcome     = document.getElementById('welcome');
+  const contentArea = document.getElementById('content-area');
+  const titleEl     = document.getElementById('content-title');
+  const badgeEl     = document.getElementById('content-type-badge');
+  const bodyEl      = document.getElementById('content-body');
+  const bcEl        = document.getElementById('breadcrumb');
+
+  // Breadcrumb
+  const ancestors = ancestorMap.get(node.id) || [node.title];
+  bcEl.innerHTML = ancestors.map((seg, i) => {
+    if (i === ancestors.length - 1) {
+      return `<span style="color:var(--text);font-weight:600">${seg}</span>`;
+    }
+    return `<span>${seg}</span><span class="bc-sep">›</span>`;
+  }).join('');
+
+  // Title
+  titleEl.textContent = node.title;
+
+  // Type badge
+  const typeLabel = { chapter:'章节', section:'小节', concept:'概念', theorem:'定理' };
+  const badgeIcon = TYPE_ICON[node.type] || '📄';
+  badgeEl.className = `${node.type}`;
+  badgeEl.id = 'content-type-badge';
+  badgeEl.innerHTML = `${badgeIcon} ${typeLabel[node.type] || node.type}`;
+
+  // Body: convert markdown-subset to HTML, then render KaTeX
+  bodyEl.innerHTML = markdownToHtml(node.content);
+
+  // Show
+  welcome.style.display = 'none';
+  contentArea.classList.add('visible');
+  contentArea.classList.remove('anim-in');
+  void contentArea.offsetWidth; // reflow
+  contentArea.classList.add('anim-in');
+
+  // KaTeX auto-render
+  if (window.renderMathInElement) {
+    renderMathInElement(bodyEl, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true  },
+        { left: '$',  right: '$',  display: false },
+      ],
+      throwOnError: false,
+      strict: false,
+    });
+  }
+
+  // Scroll main to top
+  document.getElementById('main').scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 极简 Markdown → HTML 转换
+function markdownToHtml(md) {
+  if (!md) return '';
+
+  // Protect LaTeX from HTML escaping (replace $...$ with placeholders first)
+  // We do NOT escape LaTeX — KaTeX will handle it
+  let html = md
+    // Headings
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm,  '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm,   '<h1>$1</h1>')
+    // Bold
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    // Italic
+    .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>')
+    // Inline code
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    // Tables (simple GFM)
+    .replace(/(\|.+\|\n)(\|[-| :]+\|\n)((?:\|.+\|\n?)*)/g, parseTable)
+    // Unordered list items
+    .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
+    // Blockquote
+    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+    // Consecutive <li> wrapped in <ul>
+    .replace(/((?:<li>.*<\/li>\n?)+)/g, '<ul>$1</ul>')
+    // Paragraphs: blank-line-separated blocks not starting with a tag
+    .split(/\n{2,}/)
+    .map(block => {
+      block = block.trim();
+      if (!block) return '';
+      if (/^<(h[1-6]|ul|ol|li|blockquote|table)/.test(block)) return block;
+      return '<p>' + block.replace(/\n/g, ' ') + '</p>';
+    })
+    .join('\n');
+
+  return html;
+}
+
+function parseTable(match, header, sep, body) {
+  const parseRow = (row) =>
+    row.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+
+  const headers = parseRow(header);
+  const rows    = body.trim().split('\n').filter(Boolean).map(parseRow);
+
+  const thead = headers.map(h => `<th>${h}</th>`).join('');
+  const tbody = rows.map(r => '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>').join('\n');
+
+  return `<table><thead><tr>${thead}</tr></thead><tbody>${tbody}</tbody></table>\n`;
+}
+
+/* ════════════════════════════════════════════════════════
+   搜索
+   ════════════════════════════════════════════════════════ */
+function handleSearch(query) {
+  query = query.trim().toLowerCase();
+  const allRows = document.querySelectorAll('#tree-root .tree-row');
+
+  if (!query) {
+    // Reset: collapse all, show all
+    allRows.forEach(r => {
+      r.closest('.tree-item').style.display = '';
+    });
+    document.querySelectorAll('.child-ul').forEach(ul => {
+      if (!ul.classList.contains('open')) ul.style.display = '';
+    });
+    return;
+  }
+
+  // Show all items whose label matches; expand parent ULs
+  allRows.forEach(row => {
+    const label = row.querySelector('.tree-label')?.textContent.toLowerCase() || '';
+    const li    = row.closest('.tree-item');
+    if (label.includes(query)) {
+      li.style.display = '';
+      // Expand all ancestor child-uls
+      let parent = li.parentElement;
+      while (parent && parent.id !== 'tree-root') {
+        if (parent.classList.contains('child-ul')) {
+          parent.style.display = 'block';
+          parent.classList.add('open');
+        }
+        parent = parent.parentElement;
+      }
+    } else {
+      li.style.display = 'none';
+    }
+  });
+}
+
+/* ════════════════════════════════════════════════════════
+   辅助
+   ════════════════════════════════════════════════════════ */
+function setActiveRow(row) {
+  if (activeRow) activeRow.classList.remove('active');
+  activeRow = row;
+  row.classList.add('active');
+}
+
+function toggleSidebar(force) {
+  const sidebar  = document.getElementById('sidebar');
+  const overlay  = document.getElementById('sidebar-overlay');
+  const isOpen   = sidebar.classList.contains('mobile-open');
+  const shouldOpen = force !== undefined ? force : !isOpen;
+  sidebar.classList.toggle('mobile-open', shouldOpen);
+  overlay.classList.toggle('show', shouldOpen);
+}
+</script>
+
+</body>
+</html>

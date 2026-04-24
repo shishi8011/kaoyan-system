@@ -1,0 +1,2106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>考研英语一复习</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: #f5f0e8; color: #2c2c2c; font-family: Georgia, serif; }
+
+    /* ── main tabs ── */
+    .tab-btn { transition: background .15s, color .15s; }
+    .tab-btn.active { background: #4a6fa5; color: #fff; }
+
+    /* ── question-type underline tabs ── */
+    .qtype-tab {
+      padding: 10px 16px;
+      font-size: .8rem; font-weight: 700;
+      border-bottom: 2.5px solid transparent;
+      margin-bottom: -1px;          /* overlap parent border */
+      white-space: nowrap;
+      color: #9ca3af;
+      transition: color .15s, border-color .15s;
+      letter-spacing: .01em;
+    }
+    .qtype-tab:hover:not(.active) { color: #4b5563; border-bottom-color: #d1d5db; }
+    .qtype-tab.active { color: var(--c); border-bottom-color: var(--c); }
+
+    /* ── topic tag pills ── */
+    .tag-filter-btn { transition: background .15s, color .15s, border-color .15s; }
+    .tag-filter-btn.active { background: #4a6fa5; color: #fff; border-color: #4a6fa5; }
+    .tag-count {
+      font-size: .72em; font-weight: 400; color: #aaa;
+      margin-left: 4px; letter-spacing: 0;
+      font-family: ui-monospace, monospace;
+    }
+    .tag-filter-btn.active .tag-count { color: rgba(255,255,255,.6); }
+
+    /* ── glossary words ── */
+    .gloss-word {
+      border-bottom: 1.5px dashed #4a6fa5; cursor: pointer;
+      transition: color .15s; padding-bottom: 1px; border-radius: 2px;
+    }
+    .gloss-word:hover { color: #4a6fa5; }
+    .gloss-word.active-word { color: #4a6fa5; background: #dde8f7; border-radius: 3px; }
+
+    /* ── cloze blanks (完形填空) ── */
+    .cloze-blank {
+      display: inline-block; min-width: 58px;
+      border-bottom: 2px solid #7e22ce; color: #7e22ce;
+      font-weight: 700; text-align: center; padding: 0 4px; margin: 0 2px;
+    }
+
+    /* ── paragraph labels (新题型PartB) ── */
+    .para-label {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: #0f766e; color: #fff;
+      font-size: 11px; font-weight: 700;
+      margin-right: 5px; vertical-align: middle; flex-shrink: 0;
+    }
+
+    /* ── translation underline (英译汉PartC) ── */
+    .translate-sentence {
+      text-decoration: underline; text-decoration-style: solid;
+      text-decoration-thickness: 1.5px; text-decoration-color: #b45309;
+      text-underline-offset: 3px;
+    }
+    .translate-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 15px; height: 15px; border-radius: 50%;
+      background: #b45309; color: #fff;
+      font-size: 9px; font-weight: 700;
+      margin-right: 2px; vertical-align: middle;
+    }
+
+    /* ── writing section headers ── */
+    .writing-part-header { font-weight: 700; color: #15803d; display: block; margin: 1rem 0 .4rem; }
+    .writing-part-header:first-child { margin-top: 0; }
+
+    /* ── game tab ── */
+    #game-section { animation: fadeInUp .35s ease both; }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .game-option-btn {
+      transition: background .12s, color .12s, border-color .12s, transform .08s;
+    }
+    .game-option-btn:active:not(:disabled) { transform: scale(.97); }
+    .game-option-btn.correct {
+      background: #16a34a !important; border-color: #16a34a !important;
+      color: #fff !important; box-shadow: 0 0 0 3px #bbf7d0;
+    }
+    .game-option-btn.wrong {
+      background: #dc2626 !important; border-color: #dc2626 !important;
+      color: #fff !important; box-shadow: 0 0 0 3px #fecaca;
+    }
+    .game-option-btn.dim { opacity: .35; }
+    #game-progress-bar-fill { transition: width .45s cubic-bezier(.4,0,.2,1); }
+    .heart-icon { transition: all .2s; }
+    .heart-icon.lost { filter: grayscale(1); opacity: .3; transform: scale(.85); }
+
+    /* ── mode selection cards ── */
+    .mode-card {
+      transition: transform .18s, box-shadow .18s;
+      cursor: pointer;
+    }
+    .mode-card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(74,111,165,.18); }
+    .mode-card:active { transform: translateY(-1px); }
+
+    /* ── sentence jigsaw ── */
+    .chunk-btn {
+      transition: background .13s, color .13s, border-color .13s, transform .1s, opacity .2s;
+      cursor: pointer;
+    }
+    .chunk-btn:hover:not(:disabled) { border-color: #4a6fa5; background: #edf3fb; }
+    .chunk-btn:active:not(:disabled) { transform: scale(.97); }
+    .chunk-btn.placed { opacity: .28; pointer-events: none; background: #f5f0e8; }
+    .chunk-btn.shake { animation: chunkShake .38s ease; }
+    @keyframes chunkShake {
+      0%,100% { transform:translateX(0); }
+      18%     { transform:translateX(-7px); }
+      36%     { transform:translateX(7px); }
+      54%     { transform:translateX(-5px); }
+      72%     { transform:translateX(5px); }
+    }
+    .assembled-piece {
+      animation: pieceIn .22s ease both;
+      background: #4a6fa5; color: #fff;
+      border-radius: 8px; padding: 4px 12px;
+      font-size: .8rem; font-weight: 600; line-height: 1.5;
+    }
+    @keyframes pieceIn {
+      from { opacity: 0; transform: scale(.85) translateY(4px); }
+      to   { opacity: 1; transform: scale(1)   translateY(0); }
+    }
+    .assembled-piece.final { background: #16a34a; }
+    #sentence-assembled { min-height: 42px; }
+
+    /* ── memory defense ── */
+    #memory-timer-bar-fill {
+      transition: width 1s linear;
+      background: linear-gradient(90deg, #dc2626, #f97316);
+    }
+    #memory-timer-bar-fill.urgent { background: #dc2626; animation: timerPulse .5s ease-in-out infinite alternate; }
+    @keyframes timerPulse { from { opacity: 1; } to { opacity: .55; } }
+
+    .memory-plus {
+      position: fixed;
+      font-size: 1.1rem; font-weight: 900;
+      color: #16a34a;
+      pointer-events: none;
+      z-index: 999;
+      animation: memFloat .9s ease forwards;
+    }
+    @keyframes memFloat {
+      0%   { opacity: 1; transform: translateY(0) scale(1); }
+      60%  { opacity: 1; transform: translateY(-28px) scale(1.12); }
+      100% { opacity: 0; transform: translateY(-52px) scale(.9); }
+    }
+    .proficiency-bar-fill { transition: width .5s ease; background: #4a6fa5; }
+    .proficiency-bar-fill.mastered { background: #16a34a; }
+
+    /* ── 记忆备战室 (Preview Room) ── */
+    #game-preview { animation: fadeInUp .3s ease both; }
+
+    .preview-card {
+      background: #fff;
+      border-radius: 18px;
+      border: 1px solid #e8e0d0;
+      border-left: 4px solid #4a6fa5;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,.04);
+    }
+    .preview-card-top {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 18px 8px;
+    }
+    .preview-num {
+      font-size: .72rem; font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: .04em; min-width: 22px;
+      flex-shrink: 0;
+    }
+    .preview-word {
+      font-size: 1.45rem; font-weight: 800;
+      color: #2c2c2c; letter-spacing: -.02em;
+    }
+    .preview-phonetic {
+      font-size: .78rem; color: #9ca3af;
+      font-family: monospace; margin-left: 8px;
+    }
+    .preview-meaning {
+      padding: 2px 18px 10px 52px;
+      font-size: .85rem; font-weight: 600;
+      color: #4a6fa5; line-height: 1.55;
+    }
+    .preview-example {
+      padding: 8px 18px 13px 52px;
+      font-size: .8rem; color: #6b7280;
+      line-height: 1.8;
+      border-top: 1px solid #f5f0e8;
+    }
+    .preview-en-sentence {
+      padding: 4px 18px 10px 52px;
+      font-size: .87rem; color: #1e293b;
+      font-style: italic; font-weight: 500;
+      line-height: 1.85;
+    }
+    .preview-zh-block {
+      padding: 8px 18px 8px 18px;
+      font-size: .82rem; color: #92400e;
+      background: #fffbeb; border-top: 1px solid #fde68a;
+      line-height: 1.75;
+    }
+    .preview-grammar-block {
+      padding: 8px 18px 11px 18px;
+      font-size: .78rem; color: #1e3a8a;
+      background: #eff6ff; border-top: 1px solid #bfdbfe;
+      line-height: 1.75;
+    }
+    .preview-tag {
+      display: inline-block; font-size: .6rem; font-weight: 800;
+      letter-spacing: .06em; text-transform: uppercase;
+      padding: 1px 5px; border-radius: 4px; margin-right: 6px;
+      vertical-align: middle;
+    }
+    .preview-tag-zh      { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    .preview-tag-grammar { background: #dbeafe; color: #1e3a8a; border: 1px solid #bfdbfe; }
+    .preview-tag-red     { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+    #preview-sticky-top {
+      position: sticky; top: 0; z-index: 30;
+      background: linear-gradient(to bottom, #f5f0e8 88%, transparent);
+      margin: 0 -1rem; padding: 0 1rem .5rem;
+    }
+    #preview-sticky-bot {
+      position: sticky; bottom: 0; z-index: 30;
+      background: linear-gradient(to top, #f5f0e8 85%, transparent);
+      margin: 0 -1rem; padding: .75rem 1rem .75rem;
+    }
+    #preview-confirm-btn {
+      background: linear-gradient(135deg, #4a6fa5, #3d5f90);
+      transition: filter .15s, transform .1s;
+    }
+    #preview-confirm-btn:hover  { filter: brightness(1.08); }
+    #preview-confirm-btn:active { transform: scale(.98); }
+
+    /* ── answer reveal (真题实战) ── */
+    .answer-toggle-btn {
+      display: flex; align-items: center; gap: 8px;
+      width: 100%; padding: 11px 20px;
+      font-size: .78rem; font-weight: 700; color: #4a6fa5;
+      background: #f9f7f4; border: none; cursor: pointer;
+      transition: background .15s, color .15s; text-align: left;
+      letter-spacing: .01em;
+    }
+    .answer-toggle-btn:hover { background: #f0eee8; color: #3d5f90; }
+    .answer-toggle-btn.open { background: #edeae3; color: #2c2c2c; }
+    .answer-chevron { font-size: .65rem; margin-left: auto; transition: transform .32s ease; }
+    .answer-toggle-btn.open .answer-chevron { transform: rotate(180deg); }
+    .answer-body {
+      display: grid; grid-template-rows: 0fr;
+      overflow: hidden;
+      transition: grid-template-rows .38s cubic-bezier(.4,0,.2,1);
+    }
+    .answer-body-inner { min-height: 0; }
+    .answer-body.open { grid-template-rows: 1fr; }
+
+    /* word tooltip ── */
+    #word-tooltip {
+      position: fixed; z-index: 50;
+      max-width: 280px; min-width: 180px;
+      filter: drop-shadow(0 6px 20px rgba(74,111,165,.18));
+    }
+    #word-tooltip::before {
+      content: ''; position: absolute; top: -7px; left: 18px;
+      border: 7px solid transparent; border-bottom-color: #fff; border-top: 0;
+    }
+    .vocab-card .top-bar { height: 4px; background: #4a6fa5; border-radius: 1rem 1rem 0 0; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+<!-- ═══════════ HEADER ═══════════ -->
+<header class="bg-[#4a6fa5] text-white px-6 py-4 shadow-md">
+  <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
+    <div class="flex items-center gap-4">
+      <a href="index.html"
+        class="flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-semibold
+               bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-colors">
+        ← 数学复习
+      </a>
+      <div class="w-px h-6 bg-white/20"></div>
+      <div>
+        <h1 class="text-lg font-bold tracking-wide">考研英语一复习</h1>
+        <p class="text-[#a8c2e0] text-xs mt-0.5">语料积累 &amp; 真题实战</p>
+      </div>
+    </div>
+    <span class="text-3xl select-none opacity-80">Aa</span>
+  </div>
+</header>
+
+<main class="max-w-4xl mx-auto px-4 py-8 space-y-0">
+
+  <!-- ═══════════ LEVEL 1: 主 Tab ═══════════ -->
+  <div class="mb-5">
+    <div class="flex gap-2 bg-white rounded-xl p-1 shadow-sm border border-[#e8e0d0] w-fit">
+      <button id="tab-vocab"
+        class="tab-btn px-5 py-2 rounded-lg text-sm font-bold text-[#4a6fa5]"
+        onclick="switchTab('vocab')">📖 语料积累</button>
+      <button id="tab-reading"
+        class="tab-btn px-5 py-2 rounded-lg text-sm font-bold text-[#4a6fa5]"
+        onclick="switchTab('reading')">📰 真题实战</button>
+      <button id="tab-game"
+        class="tab-btn px-5 py-2 rounded-lg text-sm font-bold text-[#4a6fa5]"
+        onclick="switchTab('game')">🎮 闯关游戏</button>
+    </div>
+  </div>
+
+  <!-- ═══════════ LEVEL 2A: 语料积累 二级切换（单词 / 长难句）═══════════ -->
+  <div id="vocab-sub-section" class="hidden mb-4">
+    <div class="flex gap-1.5 bg-white rounded-xl p-1 shadow-sm border border-[#e8e0d0] w-fit">
+      <button id="sub-word"
+        class="tab-btn px-4 py-1.5 rounded-lg text-sm font-bold text-[#4a6fa5]"
+        onclick="switchVocabSub('word')">📝 单词</button>
+      <button id="sub-sentence"
+        class="tab-btn px-4 py-1.5 rounded-lg text-sm font-bold text-[#4a6fa5]"
+        onclick="switchVocabSub('sentence')">✍️ 长难句</button>
+    </div>
+  </div>
+
+  <!-- ═══════════ LEVEL 2B: 真题实战 题型导航 ═══════════ -->
+  <div id="qtype-section" class="hidden mb-0">
+    <div class="bg-white rounded-t-2xl border border-[#e8e0d0] border-b-0 px-2">
+      <div class="pt-3 px-2 pb-0">
+        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">题型</span>
+      </div>
+      <div class="flex overflow-x-auto border-b border-[#e8e0d0]" id="qtype-bar">
+        <!-- injected by JS -->
+      </div>
+    </div>
+    <div class="bg-white border border-[#e8e0d0] border-t-0 rounded-b-2xl px-4 py-3 mb-6">
+      <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mr-2">话题筛选</span>
+      <div id="tag-bar-reading" class="inline-flex flex-wrap gap-1.5 mt-1">
+        <!-- injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ 语料积累 话题筛选（单词/长难句 子 Tab 共用）═══════════ -->
+  <div id="vocab-tag-section" class="hidden bg-white rounded-2xl border border-[#e8e0d0] px-4 py-3 mb-6">
+    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mr-2">话题筛选</span>
+    <div id="tag-bar-vocab" class="inline-flex flex-wrap gap-1.5 mt-1">
+      <!-- injected by JS -->
+    </div>
+  </div>
+
+  <!-- ═══════════ 闯关游戏 ═══════════ -->
+  <div id="game-section" class="hidden">
+
+    <!-- ══ 0. 模式选择首页 ══ -->
+    <div id="game-start">
+      <div class="text-center mb-6">
+        <div class="text-4xl mb-2">🎮</div>
+        <h2 class="text-xl font-bold text-[#2c2c2c]">选择游戏模式</h2>
+        <p class="text-xs text-gray-400 mt-1">三关全通，词汇与长难句一网打尽</p>
+      </div>
+
+      <!-- Mode 1 -->
+      <div class="mode-card bg-white rounded-2xl border-2 border-[#e8e0d0] shadow-sm px-6 py-5 mb-4"
+           onclick="startGame()">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-[#4a6fa5]/10 flex items-center justify-center text-2xl flex-shrink-0">📝</div>
+          <div class="flex-1 min-w-0">
+            <div class="font-bold text-[#2c2c2c] text-base">每日单词闯关</div>
+            <div class="text-xs text-gray-400 mt-0.5 leading-relaxed">随机抽取 <strong class="text-[#4a6fa5]">21 词</strong>，四选一答题，3 条命限制</div>
+          </div>
+          <span class="text-[#4a6fa5] font-bold text-xl flex-shrink-0">›</span>
+        </div>
+        <div class="mt-3 flex gap-1.5 flex-wrap">
+          <span class="text-[10px] bg-[#4a6fa5]/8 text-[#4a6fa5] border border-[#4a6fa5]/20 px-2 py-0.5 rounded-full font-semibold">词义辨析</span>
+          <span class="text-[10px] bg-[#4a6fa5]/8 text-[#4a6fa5] border border-[#4a6fa5]/20 px-2 py-0.5 rounded-full font-semibold">21 题 / 局</span>
+        </div>
+      </div>
+
+      <!-- Mode 2 -->
+      <div class="mode-card bg-white rounded-2xl border-2 border-[#e8e0d0] shadow-sm px-6 py-5 mb-4"
+           onclick="startSentenceGame()">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-2xl flex-shrink-0">🔗</div>
+          <div class="flex-1 min-w-0">
+            <div class="font-bold text-[#2c2c2c] text-base">长难句连连看</div>
+            <div class="text-xs text-gray-400 mt-0.5 leading-relaxed">拆解长难句译文碎片，按正确语序依次点击重组</div>
+          </div>
+          <span class="text-amber-500 font-bold text-xl flex-shrink-0">›</span>
+        </div>
+        <div class="mt-3 flex gap-1.5 flex-wrap">
+          <span class="text-[10px] bg-amber-500/8 text-amber-600 border border-amber-500/20 px-2 py-0.5 rounded-full font-semibold">句子结构</span>
+          <span class="text-[10px] bg-amber-500/8 text-amber-600 border border-amber-500/20 px-2 py-0.5 rounded-full font-semibold">10 题 / 局</span>
+          <span class="text-[10px] bg-amber-500/8 text-amber-600 border border-amber-500/20 px-2 py-0.5 rounded-full font-semibold">语法解析</span>
+        </div>
+      </div>
+
+      <!-- Mode 4: 今日闯关 -->
+      <div id="mode4-card" class="mode-card bg-white rounded-2xl border-2 border-[#e8e0d0] shadow-sm px-6 py-5 mb-4"
+           onclick="startDailyGame()">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-2xl flex-shrink-0">📅</div>
+          <div class="flex-1 min-w-0">
+            <div class="font-bold text-[#2c2c2c] text-base">今日闯关</div>
+            <div class="text-xs text-gray-400 mt-0.5 leading-relaxed">专攻今日单词！<span id="daily-pool-count" class="font-bold text-emerald-600">0</span> 词待闯关，先记后测全通过</div>
+          </div>
+          <span class="text-emerald-500 font-bold text-xl flex-shrink-0">›</span>
+        </div>
+        <div class="mt-3 flex gap-1.5 flex-wrap">
+          <span class="text-[10px] bg-emerald-500/8 text-emerald-600 border border-emerald-500/20 px-2 py-0.5 rounded-full font-semibold">今日专属</span>
+          <span class="text-[10px] bg-emerald-500/8 text-emerald-600 border border-emerald-500/20 px-2 py-0.5 rounded-full font-semibold">动态题数</span>
+          <span class="text-[10px] bg-emerald-500/8 text-emerald-600 border border-emerald-500/20 px-2 py-0.5 rounded-full font-semibold">先记忆后闯关</span>
+        </div>
+        <div id="mode4-empty-tip" class="hidden mt-3 text-xs text-gray-400 italic">— 今日暂无标注单词，请先为新词添加 #今日任务 标签 —</div>
+      </div>
+
+      <!-- Mode 3 -->
+      <div id="mode3-card" class="mode-card bg-white rounded-2xl border-2 border-[#e8e0d0] shadow-sm px-6 py-5 mb-4"
+           onclick="startMemoryGame()">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center text-2xl flex-shrink-0">🛡️</div>
+          <div class="flex-1 min-w-0">
+            <div class="font-bold text-[#2c2c2c] text-base">记忆保卫战</div>
+            <div class="text-xs text-gray-400 mt-0.5 leading-relaxed">专攻错题！<span id="error-pool-count" class="font-bold text-red-500">0</span> 道错题待征服，每题 5 秒限时</div>
+          </div>
+          <span class="text-red-400 font-bold text-xl flex-shrink-0">›</span>
+        </div>
+        <div class="mt-3 flex gap-1.5 flex-wrap">
+          <span class="text-[10px] bg-red-500/8 text-red-500 border border-red-500/20 px-2 py-0.5 rounded-full font-semibold">错题强化</span>
+          <span class="text-[10px] bg-red-500/8 text-red-500 border border-red-500/20 px-2 py-0.5 rounded-full font-semibold">5 秒限时</span>
+          <span class="text-[10px] bg-red-500/8 text-red-500 border border-red-500/20 px-2 py-0.5 rounded-full font-semibold">熟练度追踪</span>
+        </div>
+        <div id="mode3-empty-tip" class="hidden mt-3 text-xs text-gray-400 italic">— 暂无错题，先去答题积累吧 —</div>
+      </div>
+
+      <!-- 错题进度汇总 -->
+      <div id="error-summary-bar" class="hidden bg-white rounded-2xl border border-[#e8e0d0] shadow-sm px-5 py-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">错题池总览</span>
+          <span class="text-xs text-gray-400" id="error-summary-txt"></span>
+        </div>
+        <div class="w-full bg-[#e8e0d0] rounded-full h-1.5 overflow-hidden">
+          <div id="error-summary-bar-fill" class="h-1.5 rounded-full bg-[#4a6fa5]" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 0.5. 记忆备战室（Preview Room） ══ -->
+    <div id="game-preview" class="hidden">
+      <div id="preview-sticky-top">
+        <div class="bg-white rounded-2xl border border-[#e8e0d0] shadow-sm px-5 py-4">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <p id="preview-mode-badge" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">📚 记忆备战室</p>
+              <h3 id="preview-title" class="text-lg font-bold text-[#2c2c2c] mt-0.5 leading-tight"></h3>
+            </div>
+            <div class="text-right">
+              <p id="preview-count" class="text-3xl font-black leading-none"></p>
+              <p class="text-[10px] text-gray-400 mt-0.5">道题</p>
+            </div>
+          </div>
+          <div class="w-full bg-[#e8e0d0] rounded-full h-1.5 overflow-hidden">
+            <div id="preview-read-bar" class="h-1.5 rounded-full transition-all duration-300" style="width:0%"></div>
+          </div>
+          <div class="flex justify-between mt-1">
+            <span class="text-[10px] text-gray-400">浏览进度</span>
+            <span id="preview-read-text" class="text-[10px] font-bold text-gray-400">0%</span>
+          </div>
+        </div>
+      </div>
+      <div id="preview-list" class="space-y-4 pt-4 pb-6"></div>
+      <div id="preview-sticky-bot">
+        <div class="bg-white rounded-2xl border border-[#e8e0d0] shadow-lg px-5 py-4">
+          <p class="text-xs text-center text-gray-400 mb-3 leading-relaxed">建议背完所有词条后再开始测试，知识输入充分则胜率更高 💡</p>
+          <button id="preview-confirm-btn" onclick="launchGameFromPreview()"
+            class="w-full text-white font-black py-4 rounded-xl text-base shadow-md">
+            我已记住，开始闯关！ 🚀
+          </button>
+          <button onclick="showGamePanel('start')"
+            class="w-full mt-2 text-gray-500 font-semibold py-2.5 rounded-xl text-sm hover:bg-[#f5f0e8] transition-colors">
+            ← 返回选择模式
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 1. 每日单词 游戏界面 ══ -->
+    <div id="game-play" class="hidden">
+      <!-- 状态栏 -->
+      <div class="bg-white rounded-2xl border border-[#e8e0d0] shadow-sm px-5 py-4 mb-5">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-1.5" id="game-hearts"></div>
+          <span id="game-mode-label" class="text-xs font-bold text-[#4a6fa5] tracking-widest uppercase">每日单词</span>
+          <span id="game-progress-text" class="text-sm font-bold text-[#4a6fa5]">0 / 21</span>
+        </div>
+        <div class="w-full bg-[#e8e0d0] rounded-full h-2.5 overflow-hidden">
+          <div id="game-progress-bar-fill"
+               class="h-2.5 rounded-full bg-gradient-to-r from-[#4a6fa5] to-[#6b93c9]"
+               style="width:0%"></div>
+        </div>
+      </div>
+
+      <!-- 单词展示区 -->
+      <div class="bg-white rounded-2xl border border-[#e8e0d0] shadow-sm px-6 py-10 mb-5 text-center">
+        <p id="game-word-index" class="text-[10px] font-bold text-gray-300 tracking-widest uppercase mb-4">WORD 1 / 21</p>
+        <p id="game-word" class="text-5xl font-bold tracking-tight text-[#2c2c2c] mb-3 leading-tight break-all"></p>
+        <p id="game-phonetic" class="text-base text-gray-400 font-mono"></p>
+      </div>
+
+      <!-- 四选一 -->
+      <div id="game-options" class="grid grid-cols-1 gap-3 mb-4"></div>
+      <div id="game-feedback" class="hidden text-center py-2">
+        <span id="game-feedback-text" class="text-sm font-semibold"></span>
+      </div>
+    </div>
+
+    <!-- ══ 2. 长难句连连看 ══ -->
+    <div id="game-sentence" class="hidden">
+      <!-- 状态栏 -->
+      <div class="bg-white rounded-2xl border border-[#e8e0d0] shadow-sm px-5 py-4 mb-4">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-1.5" id="sentence-hearts"></div>
+          <span class="text-xs font-bold text-amber-500 tracking-widest uppercase">长难句连连看</span>
+          <span id="sentence-progress-text" class="text-sm font-bold text-amber-500">0 / 10</span>
+        </div>
+        <div class="w-full bg-[#e8e0d0] rounded-full h-2 overflow-hidden">
+          <div id="sentence-progress-bar"
+               class="h-2 rounded-full bg-gradient-to-r from-amber-400 to-amber-500"
+               style="width:0%"></div>
+        </div>
+      </div>
+
+      <!-- 英文原句展示 -->
+      <div class="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-5 mb-4">
+        <p class="text-[10px] font-bold text-amber-600 uppercase tracking-widest mb-2">英文原句 · 请按正确语序点击下方碎片</p>
+        <p id="sentence-english" class="text-[.88rem] leading-8 text-[#2c2c2c] italic font-medium"></p>
+      </div>
+
+      <!-- 已拼接区 -->
+      <div class="bg-white border border-[#e8e0d0] rounded-2xl px-5 py-4 mb-4" id="sentence-assembled-wrap">
+        <p class="text-[10px] font-bold text-gray-300 uppercase tracking-widest mb-3">已拼接的译文</p>
+        <div id="sentence-assembled" class="flex flex-wrap gap-2 min-h-[38px]"></div>
+      </div>
+
+      <!-- 碎片按钮区 -->
+      <div id="sentence-chunks" class="flex flex-wrap gap-3 mb-4"></div>
+
+      <!-- 反馈 -->
+      <div id="sentence-feedback" class="hidden text-center py-2">
+        <span id="sentence-feedback-text" class="text-sm font-semibold"></span>
+      </div>
+
+      <!-- 语法解析（答对后展示） -->
+      <div id="sentence-analysis" class="hidden bg-[#eff6ff] border border-[#bfdbfe] rounded-2xl px-5 py-4 mb-4">
+        <p class="text-[10px] font-bold text-[#4a6fa5] uppercase tracking-widest mb-2">核心语法解析</p>
+        <p id="sentence-analysis-text" class="text-xs text-[#3b5fa0] leading-6"></p>
+        <div class="mt-3 text-center">
+          <button id="sentence-next-btn" onclick="advanceSentenceGame()"
+            class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-7 py-2.5 rounded-xl text-sm shadow transition-colors">
+            下一句 →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 3. 记忆保卫战 ══ -->
+    <div id="game-memory" class="hidden">
+      <!-- 状态栏 + 倒计时 -->
+      <div class="bg-white rounded-2xl border border-[#e8e0d0] shadow-sm px-5 py-4 mb-4">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-1.5" id="memory-hearts"></div>
+          <span class="text-xs font-bold text-red-400 tracking-widest uppercase">记忆保卫战</span>
+          <span id="memory-progress-text" class="text-sm font-bold text-red-400">0 / 0</span>
+        </div>
+        <!-- 倒计时进度条 -->
+        <div class="relative w-full bg-[#e8e0d0] rounded-full h-3 overflow-hidden mb-1">
+          <div id="memory-timer-bar-fill" class="h-3 rounded-full" style="width:100%"></div>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-[10px] text-gray-400">限时 5 秒</span>
+          <span id="memory-timer-text" class="text-[10px] font-bold text-red-400">5.0s</span>
+        </div>
+      </div>
+
+      <!-- 题目展示 -->
+      <div class="bg-white rounded-2xl border border-[#e8e0d0] shadow-sm px-6 py-8 mb-4 text-center">
+        <p id="memory-q-label" class="text-[10px] font-bold text-gray-300 tracking-widest uppercase mb-4">WORD</p>
+        <p id="memory-question" class="text-3xl font-bold text-[#2c2c2c] leading-snug mb-2 break-words"></p>
+        <p id="memory-phonetic" class="text-sm text-gray-400 font-mono"></p>
+        <!-- 熟练度 -->
+        <div class="mt-4 flex items-center justify-center gap-2">
+          <span class="text-[10px] text-gray-300 uppercase tracking-widest">熟练度</span>
+          <div class="w-28 h-1.5 bg-[#e8e0d0] rounded-full overflow-hidden">
+            <div id="memory-proficiency-bar" class="proficiency-bar-fill h-1.5 rounded-full" style="width:0%"></div>
+          </div>
+          <span id="memory-proficiency-text" class="text-[10px] font-bold text-gray-300">0/3</span>
+        </div>
+      </div>
+
+      <!-- 四选一 -->
+      <div id="memory-options" class="grid grid-cols-1 gap-3 mb-4"></div>
+      <div id="memory-feedback" class="hidden text-center py-2">
+        <span id="memory-feedback-text" class="text-sm font-semibold"></span>
+      </div>
+    </div>
+
+    <!-- ══ Game Over ══ -->
+    <div id="game-over" class="hidden bg-white rounded-2xl border border-[#e8e0d0] shadow-sm px-8 py-12 text-center">
+      <div class="text-5xl mb-5">💔</div>
+      <h2 class="text-2xl font-bold text-[#dc2626] mb-2">挑战失败</h2>
+      <p id="game-over-msg" class="text-gray-500 text-sm leading-relaxed mb-8"></p>
+      <div class="flex gap-3 justify-center">
+        <button onclick="retryCurrentMode()"
+          class="bg-[#dc2626] hover:bg-[#b91c1c] text-white font-bold px-8 py-3 rounded-xl text-sm shadow-md transition-colors">
+          再来一次
+        </button>
+        <button onclick="showGamePanel('start')"
+          class="bg-[#f5f0e8] hover:bg-[#e8e0d0] text-gray-600 font-bold px-8 py-3 rounded-xl text-sm shadow-sm transition-colors">
+          选其他模式
+        </button>
+      </div>
+    </div>
+
+    <!-- ══ 结算面板 ══ -->
+    <div id="game-result" class="hidden bg-white rounded-2xl border border-[#e8e0d0] shadow-sm px-8 py-12 text-center">
+      <div id="game-result-trophy" class="text-6xl mb-4">🎉</div>
+      <h2 id="game-result-title" class="text-2xl font-bold text-[#16a34a] mb-6">通关成功！</h2>
+      <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="bg-[#f5f0e8] rounded-xl p-4">
+          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">准确率</p>
+          <p id="res-accuracy" class="text-2xl font-bold text-[#4a6fa5]"></p>
+        </div>
+        <div class="bg-[#f5f0e8] rounded-xl p-4">
+          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">用时</p>
+          <p id="res-time" class="text-2xl font-bold text-[#4a6fa5]"></p>
+        </div>
+        <div class="bg-[#f5f0e8] rounded-xl p-4">
+          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">剩余生命</p>
+          <p id="res-hearts" class="text-2xl font-bold text-[#4a6fa5]"></p>
+        </div>
+      </div>
+      <div id="res-extra" class="hidden bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-6">
+        <p id="res-extra-text" class="text-sm text-green-700 font-semibold"></p>
+      </div>
+      <p id="res-encouragement" class="text-gray-500 text-sm leading-relaxed mb-8 italic"></p>
+      <div class="flex gap-3 justify-center">
+        <button onclick="retryCurrentMode()"
+          class="bg-[#4a6fa5] hover:bg-[#3d5f90] text-white font-bold px-8 py-3 rounded-xl text-sm shadow-md transition-colors">
+          再挑战一局
+        </button>
+        <button onclick="showGamePanel('start')"
+          class="bg-[#f5f0e8] hover:bg-[#e8e0d0] text-gray-600 font-bold px-8 py-3 rounded-xl text-sm shadow-sm transition-colors">
+          选其他模式
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════ CONTENT ═══════════ -->
+  <div id="content-area" class="min-h-[200px]"></div>
+
+</main>
+
+<footer class="text-center text-xs text-gray-400 py-6 mt-4">
+  考研英语一复习工具 · 仅供个人学习使用
+</footer>
+
+<!-- ═══════════ WORD TOOLTIP ═══════════ -->
+<div id="word-tooltip" class="hidden bg-white rounded-xl border border-[#c5d8f0] p-4">
+  <div class="flex items-start justify-between gap-3 mb-1.5">
+    <span id="tt-word" class="font-bold text-[#4a6fa5] text-base leading-tight"></span>
+    <button onclick="hideTooltip()"
+      class="text-gray-300 hover:text-gray-500 text-xl font-light flex-shrink-0 -mt-0.5">×</button>
+  </div>
+  <p id="tt-def" class="text-sm text-gray-600 leading-relaxed"></p>
+</div>
+
+<script src="english_data.js"></script>
+<script>
+// ═══════════════════════════════════════════════
+//  Config
+// ═══════════════════════════════════════════════
+const Q_TYPE_CONFIG = {
+  '完形填空':      '#7e22ce',
+  '阅读理解PartA': '#1d4ed8',
+  '新题型PartB':   '#0f766e',
+  '英译汉PartC':   '#b45309',
+  '写作':          '#15803d',
+};
+// Q_TYPES 必须与 Q_TYPE_CONFIG 保持同步——buildQTypeBar 用它渲染题型导航
+const Q_TYPES = ['完形填空', '阅读理解PartA', '新题型PartB', '英译汉PartC', '写作'];
+
+const SENTENCE_TAG  = '#真题长难句';
+const SENTENCE_TAGS = [SENTENCE_TAG, '#名篇背诵'];  // 句子 Tab 收录范围
+
+// ═══════════════════════════════════════════════
+//  State
+// ═══════════════════════════════════════════════
+let currentTab      = 'vocab';   // 'vocab' | 'reading' | 'game'
+let vocabSubTab     = 'word';    // 'word'  | 'sentence'  （语料积累二级）
+let activeQType     = null;      // 真题实战题型筛选
+let activeTag       = null;      // 话题标签筛选
+let activeGlossWord = null;
+
+// ═══════════════════════════════════════════════
+//  Boot  —  默认：语料积累 → 单词
+// ═══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  switchTab('vocab');
+  refreshModeSelect();
+  document.addEventListener('click', e => {
+    if (e.target.classList.contains('gloss-word')) { handleGlossClick(e); return; }
+    if (!document.getElementById('word-tooltip').contains(e.target)) hideTooltip();
+  });
+});
+
+// ═══════════════════════════════════════════════
+//  Level-1 主 Tab 切换
+// ═══════════════════════════════════════════════
+function switchTab(tab) {
+  currentTab  = tab;
+  activeQType = null;
+  activeTag   = null;
+  hideTooltip();
+
+  ['vocab', 'reading', 'game'].forEach(t =>
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab)
+  );
+
+  const isVocab   = (tab === 'vocab');
+  const isReading = (tab === 'reading');
+  const isGame    = (tab === 'game');
+
+  // 语料积累二级菜单 & 其标签栏
+  document.getElementById('vocab-sub-section').classList.toggle('hidden', !isVocab);
+  document.getElementById('vocab-tag-section').classList.toggle('hidden', !isVocab);
+  // 真题实战题型导航（内含标签栏）
+  document.getElementById('qtype-section').classList.toggle('hidden', !isReading);
+  // 内容区 vs 游戏区
+  document.getElementById('content-area').classList.toggle('hidden', isGame);
+  document.getElementById('game-section').classList.toggle('hidden', !isGame);
+
+  if (isGame) {
+    const anyRunning = gameState.running || sentenceState.running || memoryState.running;
+    if (!anyRunning) showGamePanel('start');
+    else refreshModeSelect();
+    return;
+  }
+
+  if (isVocab) {
+    ['word', 'sentence'].forEach(s =>
+      document.getElementById('sub-' + s).classList.toggle('active', s === vocabSubTab)
+    );
+  } else {
+    buildQTypeBar();
+  }
+
+  buildTagBar();
+  renderContent();
+}
+
+// ═══════════════════════════════════════════════
+//  Level-2A 语料积累二级切换（单词 / 长难句）
+// ═══════════════════════════════════════════════
+function switchVocabSub(sub) {
+  vocabSubTab = sub;
+  activeTag   = null;
+
+  ['word', 'sentence'].forEach(s =>
+    document.getElementById('sub-' + s).classList.toggle('active', s === sub)
+  );
+
+  buildTagBar();
+  renderContent();
+}
+
+// ═══════════════════════════════════════════════
+//  Level-2B 真题实战 题型导航（原始逻辑恢复）
+// ═══════════════════════════════════════════════
+function buildQTypeBar() {
+  const bar = document.getElementById('qtype-bar');
+  bar.innerHTML = '';
+  bar.appendChild(makeQTab('全部题型', null));
+  Q_TYPES.forEach(qt => bar.appendChild(makeQTab(qt, qt)));
+}
+
+function makeQTab(label, qtype) {
+  const isActive = (activeQType === qtype);
+  const color    = qtype ? (Q_TYPE_CONFIG[qtype] || '#4a6fa5') : '#4a6fa5';
+  const btn      = document.createElement('button');
+  btn.textContent = label;
+  btn.className   = 'qtype-tab' + (isActive ? ' active' : '');
+  if (isActive) btn.style.setProperty('--c', color);
+  btn.onclick = () => {
+    activeQType = (activeQType === qtype) ? null : qtype;
+    activeTag   = null;
+    buildQTypeBar();
+    buildTagBar();
+    renderContent();
+  };
+  return btn;
+}
+
+// ═══════════════════════════════════════════════
+//  话题筛选（数据源随上下文精确切换）
+// ═══════════════════════════════════════════════
+function buildTagBar() {
+  // 根据当前模式选正确的 DOM 容器
+  const barId = currentTab === 'reading' ? 'tag-bar-reading' : 'tag-bar-vocab';
+  const bar   = document.getElementById(barId);
+  bar.innerHTML = '';
+
+  // ── 数据源严格隔离 ──────────────────────────────────────────────────────
+  // 真题实战：仅 readingData（有 questionType 字段）
+  // 单词 Tab ：仅 vocabData 中有 word 字段且无 questionType 的词汇条目
+  // 句子 Tab ：仅 vocabData 中 tags 含 #真题长难句 或 #名篇背诵 的条目
+  let source;
+  if (currentTab === 'reading') {
+    source = activeQType
+      ? readingData.filter(d => d.questionType === activeQType)
+      : readingData.filter(d => !!d.questionType);           // 保险：只取有题型的真题
+  } else if (vocabSubTab === 'word') {
+    source = vocabData.filter(d => d.word && !d.questionType && !d.tags.some(t => SENTENCE_TAGS.includes(t)));
+  } else {
+    // 句子 Tab：tags 含 #真题长难句 或 #名篇背诵
+    source = vocabData.filter(d => d.tags.some(t => SENTENCE_TAGS.includes(t)));
+  }
+
+  // 标签栏展示规则：真题实战只展示内容分类标签（不展示语法标签，避免误过滤）
+  const allTags = [...new Set(source.flatMap(d => d.tags || []))]
+    .filter(t => {
+      if (t === SENTENCE_TAG)    return false;  // 冗余，全局屏蔽
+      if (t === '#今日任务')     return false;  // 游戏专用标签，不在词库筛选栏展示
+      if (currentTab === 'reading') return false;  // 真题实战不做话题细筛
+      return true;
+    })
+    .sort();
+
+  // 始终渲染"全部"按钮，即使没有可筛选标签（保证用户总能重置）
+  if (source.length === 0) return;
+
+  // pre-compute per-tag counts
+  const tagCount = {};
+  allTags.forEach(t => { tagCount[t] = source.filter(d => (d.tags || []).includes(t)).length; });
+
+  const makeBtn = (label, count, isActive) => {
+    const btn = document.createElement('button');
+    btn.className = [
+      'tag-filter-btn text-xs font-semibold px-3 py-1 rounded-full border transition-colors',
+      isActive ? 'active' : 'bg-white text-[#4a6fa5] border-[#4a6fa5]/35 hover:bg-[#4a6fa5]/10',
+    ].join(' ');
+    const labelNode = document.createTextNode(label);
+    const countSpan = document.createElement('span');
+    countSpan.className = 'tag-count';
+    countSpan.textContent = count;
+    btn.appendChild(labelNode);
+    btn.appendChild(countSpan);
+    return btn;
+  };
+
+  const allBtn = makeBtn('全部', source.length, activeTag === null);
+  allBtn.onclick = () => { activeTag = null; buildTagBar(); renderContent(); };
+  bar.appendChild(allBtn);
+
+  allTags.forEach(tag => {
+    const btn = makeBtn(tag, tagCount[tag], activeTag === tag);
+    btn.onclick = () => {
+      activeTag = (activeTag === tag) ? null : tag;
+      buildTagBar();
+      renderContent();
+    };
+    bar.appendChild(btn);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  Content dispatcher
+// ═══════════════════════════════════════════════
+function renderContent() {
+  // ── 数据源严格隔离（与 buildTagBar 保持完全一致）────────────────────────
+  let source;
+  if (currentTab === 'reading') {
+    source = activeQType
+      ? readingData.filter(d => d.questionType === activeQType)
+      : readingData.filter(d => !!d.questionType);
+  } else if (vocabSubTab === 'word') {
+    source = vocabData.filter(d => d.word && !d.questionType && !d.tags.some(t => SENTENCE_TAGS.includes(t)));
+  } else {
+    source = vocabData.filter(d => d.tags.some(t => SENTENCE_TAGS.includes(t)));
+  }
+
+  const filtered = activeTag ? source.filter(d => (d.tags || []).includes(activeTag)) : [...source];
+
+  const area = document.getElementById('content-area');
+  area.innerHTML = '';
+  hideTooltip();
+
+  if (filtered.length === 0) {
+    const ctx = currentTab === 'reading' && activeQType
+      ? `「${activeQType}」${activeTag ? `·「${activeTag}」` : ''}`
+      : activeTag ? `「${activeTag}」` : '此分类';
+    area.innerHTML = `
+      <div class="flex flex-col items-center py-14 text-gray-300 gap-2 text-sm">
+        <span class="text-3xl">🔍</span><span>${ctx} 下暂无内容</span>
+      </div>`;
+    return;
+  }
+
+  if      (currentTab === 'reading')           renderReading(filtered, area);
+  else if (vocabSubTab === 'word')             renderVocab(filtered, area);
+  else                                         renderSentenceList(filtered, area);
+}
+
+// ═══════════════════════════════════════════════
+//  语料积累 [单词] — 单词卡网格
+// ═══════════════════════════════════════════════
+function renderVocab(data, container) {
+  const grid = document.createElement('div');
+  grid.className = 'grid gap-5 md:grid-cols-2';
+  data.forEach(item => {
+    const highlighted = item.example.replace(
+      new RegExp(`\\b(${escapeRegex(item.word)})\\b`, 'gi'),
+      `<em class="not-italic font-bold text-[#4a6fa5]">$1</em>`
+    );
+    const tagPills = item.tags.map(t =>
+      `<span class="text-[10px] font-semibold bg-[#f5f0e8] text-[#6b7280] border border-[#e8e0d0] px-2 py-0.5 rounded-full">${t}</span>`
+    ).join('');
+    const card = document.createElement('article');
+    card.className = 'vocab-card bg-white rounded-2xl shadow-sm overflow-hidden border border-[#e8e0d0]';
+    card.innerHTML = `
+      <div class="top-bar"></div>
+      <div class="p-5 flex flex-col gap-3">
+        <div class="flex items-baseline gap-3 flex-wrap">
+          <span class="text-2xl font-bold tracking-tight">${item.word}</span>
+          <span class="text-sm text-gray-400 font-mono">${item.phonetic}</span>
+        </div>
+        <p class="text-[#4a6fa5] font-semibold text-sm">${item.meaning}</p>
+        <blockquote class="border-l-2 border-[#4a6fa5]/30 pl-3 text-sm text-gray-500 italic leading-relaxed">
+          ${highlighted}
+        </blockquote>
+        <div class="flex flex-wrap gap-1.5 pt-1">${tagPills}</div>
+      </div>`;
+    grid.appendChild(card);
+  });
+  container.appendChild(grid);
+}
+
+// ═══════════════════════════════════════════════
+//  语料积累 [长难句] — 句子卡列表
+// ═══════════════════════════════════════════════
+function renderSentenceList(data, container) {
+  data.forEach(item => renderSentenceCard(item, container));
+}
+
+function renderSentenceCard(item, container) {
+  const m      = item.word.match(/^(\d{4})年翻译-(\d+)题$/);
+  const year   = m ? m[1] : '';
+  const num    = m ? m[2] : '';
+  const source = year ? `考研英语一 · 翻译第${num}题` : item.word;
+
+  // 拆分 meaning → 参考译文 ＋ 核心语法
+  const parts   = item.meaning.split(/\n\n【核心语法】/);
+  const trans   = parts[0] ? parts[0].trim() : '';
+  const grammar = parts[1] ? parts[1].trim() : '';
+
+  // 语法 tag（去除冗余的 SENTENCE_TAG）
+  const tagPills = item.tags
+    .filter(t => t !== SENTENCE_TAG)
+    .map(t =>
+      `<span class="text-[10px] font-semibold bg-[#f5f0e8] text-[#6b7280] border border-[#e8e0d0] px-2 py-0.5 rounded-full">${t}</span>`
+    ).join('');
+
+  const card = document.createElement('article');
+  card.className = 'bg-white rounded-2xl shadow-sm border border-[#e8e0d0] overflow-hidden mb-5';
+  card.innerHTML = `
+    <div class="px-5 py-3 flex items-center justify-between flex-wrap gap-2 border-b border-[#e8e0d0]"
+         style="border-left:4px solid #b45309">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-xs font-bold px-3 py-1 rounded-full border"
+          style="background:#b4530918;color:#b45309;border-color:#b4530950">英译汉PartC</span>
+        ${year ? `<span class="text-xs font-bold bg-[#4a6fa5]/10 text-[#4a6fa5] border border-[#4a6fa5]/20 px-2.5 py-1 rounded-full">${year} 年</span>` : ''}
+        <span class="text-xs text-gray-400 font-semibold">${source}</span>
+      </div>
+      <div class="flex flex-wrap gap-1.5">${tagPills}</div>
+    </div>
+    <div class="p-5 pb-4">
+      <p class="text-[.925rem] leading-9 text-[#2c2c2c] pl-3 border-l-2 border-amber-400/70 italic">${item.example}</p>
+    </div>
+    ${trans ? `<div class="border-t border-[#e8e0d0] px-5 py-3.5 bg-amber-50/50">
+      <p class="text-[10px] font-bold text-amber-700 uppercase tracking-widest mb-1.5">参考译文</p>
+      <p class="text-sm text-gray-700 leading-7">${trans}</p>
+    </div>` : ''}
+    ${grammar ? `<div class="border-t border-[#e8e0d0] px-5 py-3.5 bg-blue-50/40">
+      <p class="text-[10px] font-bold text-[#4a6fa5] uppercase tracking-widest mb-1.5">核心语法</p>
+      <p class="text-xs text-[#4a6fa5]/80 leading-6">${grammar}</p>
+    </div>` : ''}`;
+  container.appendChild(card);
+}
+
+// ═══════════════════════════════════════════════
+//  真题实战 — 答案折叠区
+// ═══════════════════════════════════════════════
+function toggleAnswer(btn) {
+  const isOpen = btn.classList.toggle('open');
+  btn.nextElementSibling.classList.toggle('open', isOpen);
+  btn.querySelector('.answer-label').textContent = isOpen ? '收起解析' : '查看答案与解析';
+}
+
+function buildAnswerSection(item) {
+  const parts = [];
+
+  // 英译汉：提取 text 中嵌入的参考译文
+  if (item.questionType === '英译汉PartC') {
+    const raw = item.text || '';
+    const zhMatch = /【参考译文】(?:<\/span>)?\s*([\s\S]+)/.exec(raw);
+    if (zhMatch) {
+      const zhHtml = zhMatch[1].trim();
+      parts.push(`
+        <div class="px-5 py-4 bg-amber-50 border-t border-amber-100">
+          <p class="text-[10px] font-bold text-amber-600 uppercase tracking-widest mb-2">📝 参考译文</p>
+          <p class="text-[.9rem] leading-8 text-amber-900">${zhHtml}</p>
+        </div>`);
+    }
+  }
+
+  // answer 字段（语法解析/答案等）
+  if (item.answer) {
+    const ansHtml = item.answer.replace(/\n/g, '<br>');
+    parts.push(`
+      <div class="px-5 py-4 bg-blue-50 border-t border-blue-100">
+        <p class="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-2">🔬 解析</p>
+        <p class="text-[.85rem] leading-7 text-[#2c2c2c]">${ansHtml}</p>
+      </div>`);
+  }
+
+  if (!parts.length) return '';
+
+  return `
+    <div class="border-t border-[#e8e0d0]">
+      <button class="answer-toggle-btn" onclick="toggleAnswer(this)">
+        <span>🔍</span>
+        <span class="answer-label">查看答案与解析</span>
+        <span class="answer-chevron">▼</span>
+      </button>
+      <div class="answer-body">
+        <div class="answer-body-inner">${parts.join('')}</div>
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════
+//  真题实战 — readingData 卡片（原始逻辑完整恢复）
+// ═══════════════════════════════════════════════
+function renderReading(data, container) {
+  data.forEach(item => {
+    const qtColor  = Q_TYPE_CONFIG[item.questionType] || '#4a6fa5';
+    const tagPills = item.tags.map(t =>
+      `<span class="text-[10px] font-semibold bg-[#f5f0e8] text-[#6b7280] border border-[#e8e0d0] px-2 py-0.5 rounded-full">${t}</span>`
+    ).join('');
+
+    const header = `
+      <div class="px-5 py-3 flex items-center justify-between flex-wrap gap-2 border-b border-[#e8e0d0]"
+           style="border-left:4px solid ${qtColor}">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold px-3 py-1 rounded-full border"
+            style="background:${qtColor}18;color:${qtColor};border-color:${qtColor}50">
+            ${item.questionType}
+          </span>
+          <span class="text-xs font-bold bg-[#4a6fa5]/10 text-[#4a6fa5] border border-[#4a6fa5]/20 px-2.5 py-1 rounded-full">
+            ${item.year} 年
+          </span>
+          <span class="text-xs text-gray-400 font-semibold">${item.source}</span>
+        </div>
+        <div class="flex flex-wrap gap-1.5">${tagPills}</div>
+      </div>`;
+
+    let body = '';
+    switch (item.questionType) {
+      case '完形填空':      body = bodyCloze(item);       break;
+      case '新题型PartB':   body = bodyNewType(item);     break;
+      case '英译汉PartC':   body = bodyTranslate(item);   break;
+      case '写作':          body = bodyWriting(item);     break;
+      default:              body = bodyStandard(item);    break;
+    }
+
+    const card = document.createElement('article');
+    card.className = 'bg-white rounded-2xl shadow-sm border border-[#e8e0d0] overflow-hidden mb-5';
+    card.innerHTML = header + body + buildAnswerSection(item);
+    container.appendChild(card);
+  });
+}
+
+// ── body builders ────────────────────────────
+function bodyStandard(item) {
+  const text = processGlossary(item.text, item.glossary || {});
+  const n    = Object.keys(item.glossary || {}).length;
+  return `
+    <div class="p-5">
+      <p class="text-[.925rem] leading-8 text-[#2c2c2c]">${text}</p>
+    </div>
+    ${n ? hint('💡', `带 <span class="border-b border-dashed border-[#4a6fa5] text-[#4a6fa5] font-semibold">虚线下划线</span> 的词可点击查看释义（共 ${n} 词）`, '#eff6ff') : ''}`;
+}
+
+function bodyCloze(item) {
+  let text = processCloze(item.text);
+  if (item.glossary) text = processGlossary(text, item.glossary);
+  return `
+    <div class="p-5">
+      <p class="text-[.925rem] leading-9 text-[#2c2c2c]">${text}</p>
+    </div>
+    ${hint('✏️', `<span class="cloze-blank">（N）</span> 为空白处，共 6 处；带虚线词可点击查看释义`, '#faf5ff')}`;
+}
+
+function bodyNewType(item) {
+  const taskBox = item.task
+    ? `<div class="mb-4 p-3 bg-teal-50 border border-teal-100 rounded-xl text-xs text-teal-800 leading-relaxed">📋 ${item.task}</div>`
+    : '';
+  let text = processNewType(item.text);
+  if (item.glossary) text = processGlossary(text, item.glossary);
+  return `
+    <div class="p-5">
+      ${taskBox}
+      <div class="text-[.925rem] leading-8 text-[#2c2c2c] space-y-4">${text}</div>
+    </div>
+    ${hint('🔀', `<span class="para-label" style="width:16px;height:16px;font-size:9px">A</span> 为段落序号；带虚线词可点击查看释义`, '#f0fdfa')}`;
+}
+
+function bodyTranslate(item) {
+  const raw = item.text || '';
+  // Strip embedded 参考译文（存于答案折叠区，不在此展示）
+  const zhIdx = raw.indexOf('【参考译文】');
+  // walk back past any leading <br> tags
+  const enRaw = zhIdx >= 0 ? raw.slice(0, raw.lastIndexOf('<br>', zhIdx)).trimEnd() : raw;
+  let text = processTranslate(enRaw, item.translateLines || []);
+  if (item.glossary) text = processGlossary(text, item.glossary);
+  const n = (item.translateLines || []).length;
+  return `
+    <div class="p-5">
+      <p class="text-[.925rem] leading-9 text-[#2c2c2c]">${text}</p>
+    </div>
+    ${hint('✍️', `<span class="translate-num">1</span><span class="translate-sentence text-amber-700 font-semibold">实线下划线</span> 为要求翻译的原句（共 ${n} 处）`, '#fffbeb')}`;
+}
+
+function bodyWriting(item) {
+  const formattedText = processWriting(item.text);
+  const vocabRow = item.glossary && Object.keys(item.glossary).length
+    ? `<div class="border-t border-[#e8e0d0] px-5 py-3 bg-green-50/40">
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">写作备用词汇（可点击查看）</p>
+        <p class="text-sm leading-8">
+          ${Object.entries(item.glossary).map(([w, d]) =>
+            `<span class="gloss-word cursor-pointer" data-word="${escapeAttr(w)}" data-def="${escapeAttr(d)}">${w}</span>`
+          ).join('<span class="text-gray-300 mx-1">·</span>')}
+        </p>
+      </div>` : '';
+  return `<div class="p-5"><div class="text-[.925rem] leading-8">${formattedText}</div></div>${vocabRow}`;
+}
+
+function hint(icon, html, bg) {
+  return `<div class="border-t border-[#e8e0d0] px-5 py-2.5 flex items-center gap-2" style="background:${bg}">
+    <span class="text-base leading-none">${icon}</span>
+    <span class="text-xs text-gray-500 leading-relaxed">${html}</span>
+  </div>`;
+}
+
+// ── text processors ──────────────────────────
+function processCloze(text) {
+  return text.replace(/_{4,}\((\d+)\)/g,
+    `<span class="cloze-blank">（$1）</span>`);
+}
+
+function processNewType(text) {
+  const labeled = text.replace(/\[([A-E])\]/g,
+    `<span class="para-label">$1</span>`);
+  return labeled.split('\n\n')
+    .filter(p => p.trim())
+    .map(p => `<p>${p.trim()}</p>`)
+    .join('');
+}
+
+function processTranslate(text, lines) {
+  let result = text;
+  lines.forEach((line, i) => {
+    result = result.split(line).join(
+      `<span class="translate-num">${i + 1}</span><span class="translate-sentence">${line}</span>`
+    );
+  });
+  return result;
+}
+
+function processWriting(text) {
+  return text
+    .replace(/^(Part [AB][^\n]+)/gm,
+      `<strong class="writing-part-header">$1</strong>`)
+    .replace(/\n/g, '<br>');
+}
+
+function processGlossary(text, glossary) {
+  let result = text;
+  Object.entries(glossary)
+    .sort((a, b) => b[0].length - a[0].length)
+    .forEach(([word, def]) => {
+      const safeDef  = escapeAttr(def);
+      const safeWord = escapeAttr(word);
+      result = result.replace(
+        new RegExp(`\\b(${escapeRegex(word)})\\b`, 'gi'),
+        `<span class="gloss-word" data-word="${safeWord}" data-def="${safeDef}">$1</span>`
+      );
+    });
+  return result;
+}
+
+// ═══════════════════════════════════════════════
+//  Word tooltip
+// ═══════════════════════════════════════════════
+function handleGlossClick(e) {
+  const el  = e.target;
+  const tip = document.getElementById('word-tooltip');
+  if (activeGlossWord === el && !tip.classList.contains('hidden')) { hideTooltip(); return; }
+  if (activeGlossWord) activeGlossWord.classList.remove('active-word');
+  activeGlossWord = el;
+  el.classList.add('active-word');
+
+  document.getElementById('tt-word').textContent = el.dataset.word;
+  document.getElementById('tt-def').textContent  = el.dataset.def;
+
+  const rect = el.getBoundingClientRect();
+  const TW   = 280;
+  let top  = rect.bottom + 10;
+  let left = rect.left;
+  if (left + TW > window.innerWidth - 12) left = window.innerWidth - TW - 12;
+  if (left < 8) left = 8;
+  if (top + 90 > window.innerHeight) top = rect.top - 96;
+  tip.style.top  = top  + 'px';
+  tip.style.left = left + 'px';
+  tip.classList.remove('hidden');
+  e.stopPropagation();
+}
+
+function hideTooltip() {
+  document.getElementById('word-tooltip').classList.add('hidden');
+  if (activeGlossWord) { activeGlossWord.classList.remove('active-word'); activeGlossWord = null; }
+}
+
+// ═══════════════════════════════════════════════
+//  Utility
+// ═══════════════════════════════════════════════
+function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+function escapeAttr(s)  {
+  return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ═══════════════════════════════════════════════
+//  🎮 游戏系统
+// ═══════════════════════════════════════════════
+
+const GAME_TOTAL        = 21;
+const SENTENCE_TOTAL    = 3;
+const GAME_MAX_HP       = 3;
+const MEMORY_TIMER_SEC  = 5;
+const SENTENCE_TAG_GAME = '#真题长难句';
+const ERROR_POOL_KEY    = 'enStudy_errorPool_v2';
+
+let currentGameMode = 'word';  // 'word' | 'sentence' | 'memory'
+let pendingMode = null;
+let pendingDeck = null;
+let _previewScrollHandler = null;
+
+// ══════════════════════════════════
+//  记忆备战室（Preview Room）
+// ══════════════════════════════════
+function openPreview(mode, deck) {
+  pendingMode = mode;
+  pendingDeck = deck;
+
+  const titles = { word: '今日单词 · 速记清单', sentence: '长难句 · 精读清单', memory: '错题精选 · 强化清单', daily: '今日专属 · 背诵清单' };
+  const barColors = { word: '#4a6fa5', sentence: '#d97706', memory: '#dc2626', daily: '#059669' };
+
+  document.getElementById('preview-title').textContent = titles[mode] || '记忆清单';
+  document.getElementById('preview-count').textContent = deck.length;
+  document.getElementById('preview-read-bar').style.background = barColors[mode] || '#4a6fa5';
+  document.getElementById('preview-read-bar').style.width = '0%';
+  document.getElementById('preview-read-text').textContent = '0%';
+
+  renderPreviewList(mode, deck);
+  showGamePanel('preview');
+  setupPreviewScroll();
+}
+
+function renderPreviewList(mode, deck) {
+  const list = document.getElementById('preview-list');
+  list.innerHTML = '';
+  deck.forEach((item, i) => {
+    let card;
+    if (mode === 'word')     card = buildWordCard(item, i);
+    else if (mode === 'sentence') card = buildSentenceCard(item, i);
+    else                     card = buildMemoryCard(item, i);
+    list.appendChild(card);
+  });
+}
+
+function buildWordCard(item, i) {
+  const div = document.createElement('div');
+  div.className = 'preview-card';
+  div.innerHTML = `
+    <div class="preview-card-top">
+      <span class="preview-num" style="color:#4a6fa5">${i + 1}</span>
+      <div>
+        <span class="preview-word">${item.word || ''}</span>
+        <span class="preview-phonetic">${item.phonetic || ''}</span>
+      </div>
+    </div>
+    <div class="preview-meaning">${item.meaning || ''}</div>
+    ${item.example ? `<div class="preview-example">${item.example}</div>` : ''}
+  `;
+  return div;
+}
+
+function buildSentenceCard(entry, i) {
+  const item = entry.item || entry;
+  const div = document.createElement('div');
+  div.className = 'preview-card';
+  const fullMeaning = item.meaning || '';
+  const grammarMatch = fullMeaning.match(/【核心语法】([\s\S]*)/);
+  const translation = fullMeaning.split(/\n{1,2}【核心语法】/)[0].trim();
+  const grammar = grammarMatch ? grammarMatch[1].trim() : '';
+  div.innerHTML = `
+    <div class="preview-card-top">
+      <span class="preview-num" style="color:#d97706">${i + 1}</span>
+      <div><span class="preview-word" style="font-size:1rem;color:#92400e">长难句</span></div>
+    </div>
+    <div class="preview-en-sentence" style="color:#92400e">${item.example || ''}</div>
+    ${translation ? `<div class="preview-zh-block"><span class="preview-tag preview-tag-zh">译文</span>${translation}</div>` : ''}
+    ${grammar ? `<div class="preview-grammar-block"><span class="preview-tag preview-tag-grammar">语法</span>${grammar}</div>` : ''}
+  `;
+  return div;
+}
+
+function buildMemoryCard(item, i) {
+  const div = document.createElement('div');
+  div.className = 'preview-card';
+  const stars = '★'.repeat(Math.min(5, item.wrongCount || 1)) + '☆'.repeat(Math.max(0, 5 - (item.wrongCount || 1)));
+  div.innerHTML = `
+    <div class="preview-card-top">
+      <span class="preview-num" style="color:#dc2626">${i + 1}</span>
+      <div>
+        <span class="preview-word">${item.word || ''}</span>
+        <span class="preview-phonetic">${item.phonetic || ''}</span>
+        <span style="font-size:.7rem;color:#dc2626;margin-left:8px" title="错误次数">${stars}</span>
+      </div>
+    </div>
+    <div class="preview-meaning" style="color:#dc2626">${item.meaning || ''}</div>
+  `;
+  return div;
+}
+
+function setupPreviewScroll() {
+  const list = document.getElementById('preview-list');
+  const bar  = document.getElementById('preview-read-bar');
+  const txt  = document.getElementById('preview-read-text');
+  const gameSection = document.querySelector('#game-section') || document.querySelector('[id^="game-"]').closest('div');
+
+  // Use the window scroll since the panel is inside a scrollable page
+  cleanupPreviewScroll();
+  _previewScrollHandler = () => {
+    const listRect = list.getBoundingClientRect();
+    const listH = list.offsetHeight;
+    if (listH === 0) return;
+    const viewH = window.innerHeight;
+    // How much of list has scrolled past the top of the viewport
+    const scrolled = Math.max(0, -listRect.top + viewH * 0.5);
+    const pct = Math.min(100, Math.round((scrolled / listH) * 100));
+    bar.style.width = pct + '%';
+    txt.textContent = pct + '%';
+  };
+  window.addEventListener('scroll', _previewScrollHandler, { passive: true });
+}
+
+function cleanupPreviewScroll() {
+  if (_previewScrollHandler) {
+    window.removeEventListener('scroll', _previewScrollHandler);
+    _previewScrollHandler = null;
+  }
+}
+
+// Fisher-Yates 洗牌算法：原地均匀随机打乱数组
+function shuffleDeck(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function launchGameFromPreview() {
+  if (!pendingMode || !pendingDeck) return;
+  const mode = pendingMode;
+  // 用 Fisher-Yates 彻底打乱题目顺序，消除位置记忆效应
+  const deck = shuffleDeck([...pendingDeck]);
+  pendingMode = null;
+  pendingDeck = null;
+  cleanupPreviewScroll();
+
+  if (mode === 'word' || mode === 'daily') {
+    currentGameMode = mode;
+    Object.assign(gameState, {
+      deck, index: 0, hp: GAME_MAX_HP,
+      correct: 0, wrong: 0, startTime: Date.now(), running: true, answering: false,
+    });
+    showGamePanel('play');
+    renderGameQuestion();
+  } else if (mode === 'sentence') {
+    currentGameMode = 'sentence';
+    Object.assign(sentenceState, {
+      deck, index: 0, hp: GAME_MAX_HP,
+      correct: 0, wrong: 0, startTime: Date.now(), running: true, answering: false,
+    });
+    showGamePanel('sentence');
+    renderSentenceQuestion();
+  } else if (mode === 'memory') {
+    currentGameMode = 'memory';
+    Object.assign(memoryState, {
+      deck, index: 0, hp: GAME_MAX_HP,
+      correct: 0, wrong: 0, startTime: Date.now(),
+      running: true, answering: false, graduated: 0,
+    });
+    showGamePanel('memory');
+    renderMemoryQuestion();
+  }
+}
+
+// ══════════════════════════════════
+//  面板切换
+// ══════════════════════════════════
+function showGamePanel(name) {
+  ['game-start','game-preview','game-play','game-sentence','game-memory','game-over','game-result'].forEach(id =>
+    document.getElementById(id).classList.toggle('hidden', id !== 'game-' + name)
+  );
+  if (name === 'start') refreshModeSelect();
+  if (name !== 'preview') cleanupPreviewScroll();
+}
+
+function retryCurrentMode() {
+  if      (currentGameMode === 'word')     startGame();
+  else if (currentGameMode === 'daily')    startDailyGame();
+  else if (currentGameMode === 'sentence') startSentenceGame();
+  else                                      startMemoryGame();
+}
+
+// ══════════════════════════════════
+//  通用工具
+// ══════════════════════════════════
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function renderHearts(elId, hp, max) {
+  const el = document.getElementById(elId);
+  el.innerHTML = '';
+  for (let i = 0; i < max; i++) {
+    const s = document.createElement('span');
+    s.className = 'heart-icon text-2xl select-none' + (i >= hp ? ' lost' : '');
+    s.textContent = '❤️';
+    el.appendChild(s);
+  }
+}
+
+function calcResultStats(state) {
+  const total   = state.correct + state.wrong;
+  const acc     = total > 0 ? Math.round((state.correct / total) * 100) : 100;
+  const elapsed = Math.round((Date.now() - state.startTime) / 1000);
+  const mins    = Math.floor(elapsed / 60);
+  const secs    = elapsed % 60;
+  return { acc, timeStr: mins > 0 ? `${mins}m ${secs}s` : `${secs}s`, hpLeft: state.hp };
+}
+
+// ══════════════════════════════════
+//  错题池 (localStorage)
+// ══════════════════════════════════
+function loadErrorPool() {
+  try { return JSON.parse(localStorage.getItem(ERROR_POOL_KEY) || '{}'); }
+  catch { return {}; }
+}
+function saveErrorPool(pool) {
+  try { localStorage.setItem(ERROR_POOL_KEY, JSON.stringify(pool)); } catch {}
+}
+function getErrorPoolItems() {
+  return Object.values(loadErrorPool());
+}
+function errorPoolSize() {
+  return Object.keys(loadErrorPool()).length;
+}
+
+function addToErrorPool(item) {
+  if (!item || !item.word || !item.meaning) return;
+  const pool = loadErrorPool();
+  const key  = item.id || item.word;
+  if (pool[key]) {
+    pool[key].wrongCount++;
+    pool[key].mastery = Math.max(0, pool[key].mastery - 1); // 答错则退一级
+  } else {
+    pool[key] = {
+      id:         key,
+      word:       item.word,
+      phonetic:   item.phonetic || '',
+      meaning:    item.meaning,
+      wrongCount: 1,
+      mastery:    0,   // 0-3，答对+1，达到3时"毕业"
+    };
+  }
+  saveErrorPool(pool);
+}
+
+function incrementMastery(id) {
+  const pool = loadErrorPool();
+  if (!pool[id]) return false;
+  pool[id].mastery++;
+  const graduated = pool[id].mastery >= 3;
+  if (graduated) delete pool[id];
+  saveErrorPool(pool);
+  return graduated;
+}
+
+function refreshModeSelect() {
+  const count = errorPoolSize();
+  const el = document.getElementById('error-pool-count');
+  if (el) el.textContent = count;
+  const tip = document.getElementById('mode3-empty-tip');
+  if (tip) tip.classList.toggle('hidden', count > 0);
+
+  // 今日闯关：动态读取 #今日任务 标签词数
+  const dailyCount = vocabData.filter(item => item.tags.includes('#今日任务')).length;
+  const dailyEl  = document.getElementById('daily-pool-count');
+  if (dailyEl) dailyEl.textContent = dailyCount;
+  const dailyTip = document.getElementById('mode4-empty-tip');
+  if (dailyTip) dailyTip.classList.toggle('hidden', dailyCount > 0);
+
+  // 错题汇总进度条（最多追踪50题）
+  const bar = document.getElementById('error-summary-bar');
+  if (!bar) return;
+  if (count === 0) { bar.classList.add('hidden'); return; }
+  bar.classList.remove('hidden');
+  const maxShow = 50;
+  const pct = Math.min(100, Math.round((count / maxShow) * 100));
+  document.getElementById('error-summary-bar-fill').style.width = pct + '%';
+  document.getElementById('error-summary-txt').textContent = `共 ${count} 道`;
+}
+
+// ══════════════════════════════════
+//  模式一：每日单词
+// ══════════════════════════════════
+const gameState = {
+  running: false, deck: [], index: 0,
+  hp: GAME_MAX_HP, correct: 0, wrong: 0,
+  startTime: 0, answering: false,
+};
+
+function startGame() {
+  const pool = vocabData.filter(d => d.word && d.meaning && !d.tags.some(t => SENTENCE_TAGS.includes(t)));
+  if (pool.length < GAME_TOTAL) { alert('词库单词不足！'); return; }
+  shuffle(pool);
+  openPreview('word', pool.slice(0, GAME_TOTAL));
+}
+
+function startDailyGame() {
+  // 动态抓取：仅取带 #今日任务 标签的词条（排除句子类条目）
+  const todayPool = vocabData.filter(d =>
+    d.word && d.meaning &&
+    d.tags.includes('#今日任务') &&
+    !d.tags.some(t => SENTENCE_TAGS.includes(t))
+  );
+  if (todayPool.length === 0) {
+    alert('今日单词库为空！\n请先在 english_data.js 中为今日新词添加 #今日任务 标签。');
+    return;
+  }
+  currentGameMode = 'daily';
+  // 不 shuffle，按导入顺序展示（记忆备战室可顺序预习），闯关阶段才随机出题顺序
+  openPreview('daily', todayPool);
+}
+
+function renderGameQuestion() {
+  const { deck, index, hp } = gameState;
+  const total   = deck.length;
+  const current = deck[index];
+
+  // 动态标签：区分普通模式 vs 今日闯关
+  const labelEl = document.getElementById('game-mode-label');
+  if (labelEl) {
+    labelEl.textContent = currentGameMode === 'daily' ? '今日闯关' : '每日单词';
+    labelEl.style.color = currentGameMode === 'daily' ? '#059669' : '';
+  }
+
+  const pct = (index / total) * 100;
+  document.getElementById('game-progress-bar-fill').style.width = pct + '%';
+  document.getElementById('game-progress-text').textContent  = `${index} / ${total}`;
+  document.getElementById('game-word-index').textContent     = `WORD ${index + 1} / ${total}`;
+  document.getElementById('game-word').textContent           = current.word;
+  document.getElementById('game-phonetic').textContent       = current.phonetic || '';
+  renderHearts('game-hearts', hp, GAME_MAX_HP);
+
+  // 生成选项
+  const wrongPool = shuffle(
+    deck.filter((_, i) => i !== index)
+      .concat(vocabData.filter(d => d.word && d.meaning && !d.tags.some(t => SENTENCE_TAGS.includes(t)) && !deck.includes(d)))
+  );
+  const distractors = [];
+  for (const item of wrongPool) {
+    if (distractors.length === 3) break;
+    if (item.meaning !== current.meaning) distractors.push(item.meaning);
+  }
+
+  const optContainer = document.getElementById('game-options');
+  optContainer.innerHTML = '';
+  shuffle([current.meaning, ...distractors]).forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'game-option-btn w-full text-left px-5 py-4 rounded-xl border-2 border-[#e8e0d0] bg-white hover:bg-[#edf3fb] hover:border-[#4a6fa5] text-sm text-[#2c2c2c] font-medium leading-relaxed';
+    btn.textContent = opt;
+    btn.onclick = () => handleAnswer(opt, current.meaning, btn);
+    optContainer.appendChild(btn);
+  });
+
+  document.getElementById('game-feedback').classList.add('hidden');
+  gameState.answering = false;
+}
+
+function handleAnswer(chosen, correct, clickedBtn) {
+  if (gameState.answering) return;
+  gameState.answering = true;
+
+  const isCorrect = (chosen === correct);
+  const allBtns   = document.querySelectorAll('#game-options .game-option-btn');
+  const current   = gameState.deck[gameState.index];
+
+  if (isCorrect) {
+    clickedBtn.classList.add('correct');
+    gameState.correct++;
+    showFeedbackEl('game-feedback', '✅ 正确！', '#16a34a');
+  } else {
+    clickedBtn.classList.add('wrong');
+    gameState.hp--;
+    gameState.wrong++;
+    addToErrorPool(current);
+    allBtns.forEach(b => { if (b.textContent === correct) b.classList.add('correct'); });
+    showFeedbackEl('game-feedback', '❌ 答错了！已加入错题池', '#dc2626');
+  }
+
+  allBtns.forEach(b => {
+    b.disabled = true;
+    if (!b.classList.contains('correct') && !b.classList.contains('wrong')) b.classList.add('dim');
+  });
+  renderHearts('game-hearts', gameState.hp, GAME_MAX_HP);
+
+  setTimeout(() => {
+    gameState.index++;
+    if (gameState.hp <= 0)                        { gameState.running = false; showGameOver();                                           return; }
+    if (gameState.index >= gameState.deck.length) { gameState.running = false; showGameResult(currentGameMode === 'daily' ? 'daily' : 'word'); return; }
+    renderGameQuestion();
+  }, 1100);
+}
+
+function showFeedbackEl(elId, msg, color) {
+  const el  = document.getElementById(elId);
+  const txt = el.querySelector('span');
+  txt.textContent = msg;
+  txt.style.color = color;
+  el.classList.remove('hidden');
+}
+
+// ══════════════════════════════════
+//  模式二：长难句连连看
+// ══════════════════════════════════
+const sentenceState = {
+  running: false, deck: [], index: 0,
+  hp: GAME_MAX_HP, correct: 0, wrong: 0,
+  startTime: 0, answering: false,
+  chunks: [],       // [{text, order}] original ordered
+  nextExpected: 0,  // next chunk order to click
+};
+
+function makeSentenceChunks(meaning) {
+  // 取中文译文部分（【核心语法】之前）
+  const trans = meaning.split(/\n{1,2}【核心语法】/)[0].trim();
+
+  // 先尝试以 ；分割
+  let parts = trans.split('；').map(s => s.trim()).filter(s => s.length > 3);
+
+  // ；太少时改用 ，分割
+  if (parts.length < 3) {
+    const byComma = trans.split('，').map(s => s.trim()).filter(s => s.length > 3);
+    // 两两合并成 3-5 块
+    const grouped = [];
+    const step = Math.max(1, Math.ceil(byComma.length / 5));
+    for (let i = 0; i < byComma.length; i += step) {
+      grouped.push(byComma.slice(i, i + step).join('，'));
+    }
+    parts = grouped;
+  }
+
+  // 块数超过 6 时合并
+  while (parts.length > 6) {
+    let minI = 0, minL = Infinity;
+    for (let i = 0; i < parts.length - 1; i++) {
+      const l = parts[i].length + parts[i + 1].length;
+      if (l < minL) { minL = l; minI = i; }
+    }
+    parts.splice(minI, 2, parts[minI] + '，' + parts[minI + 1]);
+  }
+
+  return parts.length >= 3 ? parts : null;
+}
+
+function startSentenceGame() {
+  currentGameMode = 'sentence';
+  const pool = vocabData.filter(d =>
+    d.tags.includes(SENTENCE_TAG_GAME) &&
+    typeof d.meaning === 'string' && d.meaning.length > 20 &&
+    typeof d.example === 'string' && d.example.length > 10
+  );
+  if (pool.length < 3) { alert('长难句数据不足，请先补充！'); return; }
+
+  shuffle(pool);
+  const validDeck = [];
+  for (const item of pool) {
+    const chunks = makeSentenceChunks(item.meaning);
+    if (chunks) { validDeck.push({ item, chunks }); }
+    if (validDeck.length >= SENTENCE_TOTAL) break;
+  }
+  if (validDeck.length < 3) { alert('有效长难句不足，无法开始！'); return; }
+
+  openPreview('sentence', validDeck);
+}
+
+function renderSentenceQuestion() {
+  const total = sentenceState.deck.length;
+  const { index, hp } = sentenceState;
+  const { item, chunks } = sentenceState.deck[index];
+
+  const pct = (index / total) * 100;
+  document.getElementById('sentence-progress-bar').style.width = pct + '%';
+  document.getElementById('sentence-progress-text').textContent = `${index} / ${total}`;
+  renderHearts('sentence-hearts', hp, GAME_MAX_HP);
+
+  document.getElementById('sentence-english').textContent = item.example;
+  document.getElementById('sentence-assembled').innerHTML = '';
+  document.getElementById('sentence-analysis').classList.add('hidden');
+  document.getElementById('sentence-feedback').classList.add('hidden');
+
+  // 存储 chunk 信息
+  sentenceState.chunks      = chunks.map((text, order) => ({ text, order }));
+  sentenceState.nextExpected = 0;
+  sentenceState.answering   = false;
+
+  // 打乱顺序渲染碎片按钮
+  const shuffled = shuffle([...sentenceState.chunks]);
+  const container = document.getElementById('sentence-chunks');
+  container.innerHTML = '';
+  shuffled.forEach(({ text, order }) => {
+    const btn = document.createElement('button');
+    btn.className = 'chunk-btn px-4 py-2 rounded-xl border-2 border-[#e8e0d0] text-sm text-[#2c2c2c] font-medium leading-relaxed text-left';
+    btn.textContent = text;
+    btn.dataset.order = order;
+    btn.onclick = () => handleChunkClick(btn);
+    container.appendChild(btn);
+  });
+}
+
+function handleChunkClick(btn) {
+  if (sentenceState.answering) return;
+  const clicked = parseInt(btn.dataset.order, 10);
+  const expected = sentenceState.nextExpected;
+  const isCorrect = clicked === expected;
+
+  if (isCorrect) {
+    btn.disabled = true;
+    btn.classList.add('placed');
+
+    // 添加到已拼接区
+    const assembled = document.getElementById('sentence-assembled');
+    const piece = document.createElement('span');
+    const isLast = (expected === sentenceState.chunks.length - 1);
+    piece.className = 'assembled-piece' + (isLast ? ' final' : '');
+    piece.textContent = btn.textContent;
+    assembled.appendChild(piece);
+
+    sentenceState.nextExpected++;
+
+    // 全部正确
+    if (sentenceState.nextExpected >= sentenceState.chunks.length) {
+      sentenceState.correct++;
+      sentenceState.answering = true;
+      showFeedbackEl('sentence-feedback', '✅ 完美！译文拼接成功！', '#16a34a');
+
+      // 已拼接区全部变绿
+      document.querySelectorAll('#sentence-assembled .assembled-piece').forEach(p => p.classList.add('final'));
+
+      // 展示语法解析
+      const { item } = sentenceState.deck[sentenceState.index];
+      const grammarPart = item.meaning.split(/\n{1,2}【核心语法】/)[1];
+      if (grammarPart) {
+        document.getElementById('sentence-analysis-text').textContent = grammarPart.trim();
+        document.getElementById('sentence-analysis').classList.remove('hidden');
+      } else {
+        advanceSentenceGame();
+      }
+    }
+  } else {
+    // 答错：抖动 + 扣 HP
+    sentenceState.hp--;
+    sentenceState.wrong++;
+    addToErrorPool(sentenceState.deck[sentenceState.index].item);
+
+    btn.classList.add('shake');
+    setTimeout(() => { btn.classList.remove('shake'); }, 420);
+
+    showFeedbackEl('sentence-feedback', `❌ 顺序有误！第 ${expected + 1} 段不是这个`, '#dc2626');
+    setTimeout(() => document.getElementById('sentence-feedback').classList.add('hidden'), 1200);
+
+    renderHearts('sentence-hearts', sentenceState.hp, GAME_MAX_HP);
+
+    if (sentenceState.hp <= 0) {
+      sentenceState.running = false;
+      sentenceState.answering = true;
+      setTimeout(() => showGameOver(), 500);
+    }
+  }
+}
+
+function advanceSentenceGame() {
+  sentenceState.index++;
+  const total = sentenceState.deck.length;
+  if (sentenceState.hp <= 0)            { sentenceState.running = false; showGameOver();          return; }
+  if (sentenceState.index >= total)     { sentenceState.running = false; showGameResult('sentence'); return; }
+  renderSentenceQuestion();
+}
+
+// ══════════════════════════════════
+//  模式三：记忆保卫战
+// ══════════════════════════════════
+const memoryState = {
+  running: false, deck: [], index: 0,
+  hp: GAME_MAX_HP, correct: 0, wrong: 0,
+  startTime: 0, answering: false,
+  timerHandle: null, timerStart: 0,
+  graduated: 0,
+};
+
+function startMemoryGame() {
+  const items = getErrorPoolItems();
+  if (items.length === 0) { alert('错题池为空！先去答题积累错题吧 😊'); return; }
+
+  // 按错误次数倒序 + 高权重前 5 随机打散
+  items.sort((a, b) => b.wrongCount - a.wrongCount);
+  const top5 = items.slice(0, 5);
+  shuffle(top5);
+  const deck = [...top5, ...items.slice(5)];
+
+  openPreview('memory', deck);
+}
+
+function renderMemoryQuestion() {
+  clearMemoryTimer();
+  const { deck, index, hp } = memoryState;
+  const total   = deck.length;
+  const current = deck[index];
+
+  document.getElementById('memory-progress-text').textContent = `${index} / ${total}`;
+  renderHearts('memory-hearts', hp, GAME_MAX_HP);
+
+  // 熟练度
+  const mastery = current.mastery || 0;
+  document.getElementById('memory-proficiency-bar').style.width = (mastery / 3 * 100) + '%';
+  document.getElementById('memory-proficiency-text').textContent = `${mastery}/3`;
+
+  // 题目
+  const isSentence = typeof current.word === 'string' && current.word.length > 30;
+  document.getElementById('memory-q-label').textContent = isSentence ? 'SENTENCE' : 'WORD';
+  const qEl = document.getElementById('memory-question');
+  qEl.textContent = current.word;
+  qEl.className = isSentence
+    ? 'text-sm font-semibold text-[#2c2c2c] leading-relaxed mb-2 italic break-words'
+    : 'text-3xl font-bold text-[#2c2c2c] leading-snug mb-2 break-words';
+  document.getElementById('memory-phonetic').textContent = current.phonetic || '';
+
+  // 生成干扰项
+  const correct = current.meaning;
+  const distractorPool = shuffle(
+    vocabData.filter(d => d.word && d.meaning && d.meaning !== correct && !d.tags.some(t => SENTENCE_TAGS.includes(t)))
+  );
+  const distractors = [];
+  for (const item of distractorPool) {
+    if (distractors.length >= 3) break;
+    if (item.meaning !== correct) distractors.push(item.meaning);
+  }
+
+  const optContainer = document.getElementById('memory-options');
+  optContainer.innerHTML = '';
+  shuffle([correct, ...distractors.slice(0, 3)]).forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'game-option-btn w-full text-left px-5 py-4 rounded-xl border-2 border-[#e8e0d0] bg-white hover:bg-[#fff0f0] hover:border-red-300 text-sm text-[#2c2c2c] font-medium leading-relaxed';
+    btn.textContent = opt;
+    btn.dataset.isCorrect = (opt === correct) ? '1' : '';
+    btn.onclick = () => handleMemoryAnswer(opt, correct, btn);
+    optContainer.appendChild(btn);
+  });
+
+  document.getElementById('memory-feedback').classList.add('hidden');
+  memoryState.answering = false;
+  startMemoryTimer();
+}
+
+function startMemoryTimer() {
+  const duration = MEMORY_TIMER_SEC * 1000;
+  memoryState.timerStart = Date.now();
+  const barEl  = document.getElementById('memory-timer-bar-fill');
+  const textEl = document.getElementById('memory-timer-text');
+
+  barEl.style.transition = 'none';
+  barEl.style.width      = '100%';
+  barEl.classList.remove('urgent');
+  void barEl.offsetWidth; // force reflow
+
+  const tick = () => {
+    const elapsed   = Date.now() - memoryState.timerStart;
+    const remaining = Math.max(0, duration - elapsed);
+    const pct       = (remaining / duration) * 100;
+    barEl.style.transition = 'none';
+    barEl.style.width = pct + '%';
+    textEl.textContent = (remaining / 1000).toFixed(1) + 's';
+
+    if (remaining < 2000) {
+      barEl.style.background = '#dc2626';
+      barEl.classList.add('urgent');
+    } else if (remaining < 3500) {
+      barEl.style.background = 'linear-gradient(90deg,#ea580c,#f97316)';
+    } else {
+      barEl.style.background = 'linear-gradient(90deg,#16a34a,#22c55e)';
+      barEl.classList.remove('urgent');
+    }
+
+    if (remaining <= 0) {
+      clearMemoryTimer();
+      if (!memoryState.answering) handleMemoryTimeout();
+      return;
+    }
+    memoryState.timerHandle = requestAnimationFrame(tick);
+  };
+  memoryState.timerHandle = requestAnimationFrame(tick);
+}
+
+function clearMemoryTimer() {
+  if (memoryState.timerHandle) {
+    cancelAnimationFrame(memoryState.timerHandle);
+    memoryState.timerHandle = null;
+  }
+}
+
+function handleMemoryTimeout() {
+  if (memoryState.answering) return;
+  memoryState.answering = true;
+  memoryState.hp--;
+  memoryState.wrong++;
+
+  const current = memoryState.deck[memoryState.index];
+  addToErrorPool({ word: current.word, phonetic: current.phonetic, meaning: current.meaning, id: current.id });
+
+  const allBtns = document.querySelectorAll('#memory-options .game-option-btn');
+  allBtns.forEach(b => {
+    b.disabled = true;
+    if (b.dataset.isCorrect) b.classList.add('correct');
+    else b.classList.add('dim');
+  });
+  renderHearts('memory-hearts', memoryState.hp, GAME_MAX_HP);
+  showFeedbackEl('memory-feedback', '⏰ 超时！扣一条命', '#dc2626');
+
+  setTimeout(() => advanceMemoryGame(), 1600);
+}
+
+function handleMemoryAnswer(chosen, correct, clickedBtn) {
+  if (memoryState.answering) return;
+  memoryState.answering = true;
+  clearMemoryTimer();
+
+  const isCorrect = (chosen === correct);
+  const allBtns   = document.querySelectorAll('#memory-options .game-option-btn');
+  const current   = memoryState.deck[memoryState.index];
+
+  if (isCorrect) {
+    clickedBtn.classList.add('correct');
+    memoryState.correct++;
+    const graduated = incrementMastery(current.id);
+    if (graduated) {
+      memoryState.graduated++;
+      showMemoryPlus('🎓 记忆毕业！', clickedBtn);
+    } else {
+      showMemoryPlus('记忆 +1 ✨', clickedBtn);
+    }
+    showFeedbackEl('memory-feedback', '✅ 答对了！记忆值提升！', '#16a34a');
+  } else {
+    clickedBtn.classList.add('wrong');
+    memoryState.hp--;
+    memoryState.wrong++;
+    addToErrorPool({ word: current.word, phonetic: current.phonetic, meaning: current.meaning, id: current.id });
+    allBtns.forEach(b => { if (b.dataset.isCorrect) b.classList.add('correct'); });
+    showFeedbackEl('memory-feedback', '❌ 答错了！继续加油', '#dc2626');
+  }
+
+  allBtns.forEach(b => {
+    b.disabled = true;
+    if (!b.classList.contains('correct') && !b.classList.contains('wrong')) b.classList.add('dim');
+  });
+  renderHearts('memory-hearts', memoryState.hp, GAME_MAX_HP);
+
+  setTimeout(() => advanceMemoryGame(), 1600);
+}
+
+function advanceMemoryGame() {
+  memoryState.index++;
+  const total = memoryState.deck.length;
+  if (memoryState.hp <= 0)          { memoryState.running = false; clearMemoryTimer(); showGameOver();          return; }
+  if (memoryState.index >= total)   { memoryState.running = false; clearMemoryTimer(); showGameResult('memory'); return; }
+  renderMemoryQuestion();
+}
+
+function showMemoryPlus(msg, anchorBtn) {
+  const rect = anchorBtn.getBoundingClientRect();
+  const el   = document.createElement('div');
+  el.className   = 'memory-plus';
+  el.textContent = msg;
+  el.style.left  = (rect.left + rect.width / 2 - 40) + 'px';
+  el.style.top   = (rect.top - 10 + window.scrollY) + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 950);
+}
+
+// ══════════════════════════════════
+//  通用结算 / Game Over
+// ══════════════════════════════════
+function showGameOver() {
+  const state = currentGameMode === 'word' ? gameState
+              : currentGameMode === 'sentence' ? sentenceState
+              : memoryState;
+  const modeLabel = { word: '单词', daily: '单词', sentence: '长难句', memory: '记忆题' }[currentGameMode] || '题';
+  document.getElementById('game-over-msg').textContent =
+    `在第 ${state.index + 1} 个${modeLabel}时生命耗尽，共答对 ${state.correct} 题！继续加油！`;
+  showGamePanel('over');
+  refreshModeSelect();
+}
+
+function showGameResult(mode = 'word') {
+  currentGameMode = mode;
+  const state  = mode === 'word' ? gameState : mode === 'sentence' ? sentenceState : memoryState;
+  const { acc, timeStr, hpLeft } = calcResultStats(state);
+
+  document.getElementById('res-accuracy').textContent = acc + '%';
+  document.getElementById('res-time').textContent     = timeStr;
+  document.getElementById('res-hearts').textContent   = hpLeft > 0 ? '❤️'.repeat(hpLeft) : '—';
+
+  // 模式标题
+  const titles = { word: '单词通关！', daily: '今日闯关完成！', sentence: '长难句攻克！', memory: '记忆保卫成功！' };
+  document.getElementById('game-result-title').textContent = titles[mode] || '通关成功！';
+
+  // 额外信息（记忆保卫战毕业数）
+  const extra = document.getElementById('res-extra');
+  const extraTxt = document.getElementById('res-extra-text');
+  if (mode === 'memory' && memoryState.graduated > 0) {
+    extraTxt.textContent = `🎓 本局共有 ${memoryState.graduated} 道题完成记忆毕业，已从错题池移除！`;
+    extra.classList.remove('hidden');
+  } else {
+    extra.classList.add('hidden');
+  }
+
+  const wordEncourgements  = ['词汇量又涨了一截，考研加油！','完美通关！词汇功底相当扎实！','势不可挡！每天一局，词汇量蹭蹭上涨！'];
+  const dailyEncouragements = ['今日单词全部拿下，明天继续加油！','今日任务完成！每天一批，词汇稳步提升！','今日专属关卡通关！坚持就是胜利！'];
+  const sentEncouragements = ['长难句结构了如指掌！','语法高手实至名归！','句子不再难，继续攻坚！'];
+  const memEncouragements  = ['坚持复习，弱点变强项！','逐个击破，错题清零！','记忆力超强，保持节奏！'];
+  const picks = mode === 'daily' ? dailyEncouragements : mode === 'word' ? wordEncourgements : mode === 'sentence' ? sentEncouragements : memEncouragements;
+
+  const pick = acc === 100 ? picks[1] : picks[Math.floor(Math.random() * picks.length)];
+  document.getElementById('res-encouragement').textContent = '「' + pick + '」';
+  document.getElementById('game-result-trophy').textContent = acc >= 90 ? '🏆' : acc >= 70 ? '🎉' : '💪';
+
+  // 进度条收尾（单词类模式共用）
+  if (mode === 'word' || mode === 'daily') {
+    const total = gameState.deck.length;
+    document.getElementById('game-progress-bar-fill').style.width = '100%';
+    document.getElementById('game-progress-text').textContent = `${total} / ${total}`;
+  }
+
+  showGamePanel('result');
+  refreshModeSelect();
+}
+</script>
+</body>
+</html>
