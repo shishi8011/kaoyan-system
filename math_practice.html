@@ -321,6 +321,50 @@
       font-family: system-ui, sans-serif;
     }
 
+    /* ── Chapter / Section Groups (教材模式) ── */
+    .chapter-group {
+      margin-bottom: 44px;
+    }
+    .chapter-title {
+      font-family: 'Noto Serif SC', 'Georgia', serif;
+      font-size: 1.32rem;
+      color: var(--accent-dark);
+      font-weight: 700;
+      padding: 8px 0 12px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid var(--accent);
+      letter-spacing: .04em;
+    }
+    .section-group {
+      margin-bottom: 32px;
+    }
+    .section-title {
+      font-family: 'Noto Serif SC', 'Georgia', serif;
+      font-size: 1.05rem;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: .02em;
+    }
+    .section-bar {
+      display: inline-block;
+      width: 4px;
+      height: 18px;
+      background: var(--accent);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .section-count {
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 400;
+      margin-left: auto;
+      font-family: system-ui, sans-serif;
+    }
+
     /* ── Score Row ── */
     .score-row {
       display: grid;
@@ -387,7 +431,7 @@
   <main>
     <div class="mode-tabs" id="mode-tabs"></div>
     <div class="filter-chips" id="filter-chips"></div>
-    <div class="card-grid" id="card-grid"></div>
+    <div id="card-grid"></div>
   </main>
 
   <script>
@@ -444,41 +488,148 @@
       const modeItems = currentMode
         ? mathQuestionBank.filter(q => q.source === currentMode)
         : mathQuestionBank;
-      const tagSet = new Set();
-      modeItems.forEach(q => {
-        (q.tags || []).forEach(t => tagSet.add(t));
-      });
-      const tags = [...tagSet];
       const box = document.getElementById('filter-chips');
       box.innerHTML = '';
-      const all = document.createElement('button');
-      all.className = 'chip' + (currentFilter === 'ALL' ? ' active' : '');
-      all.textContent = '全部';
-      all.onclick = () => { currentFilter = 'ALL'; render(); };
-      box.appendChild(all);
-      tags.forEach(tag => {
+
+      function addChip(value, label) {
         const btn = document.createElement('button');
-        btn.className = 'chip' + (currentFilter === tag ? ' active' : '');
-        btn.textContent = tag;
-        btn.onclick = () => { currentFilter = tag; render(); };
+        btn.className = 'chip' + (currentFilter === value ? ' active' : '');
+        btn.textContent = label;
+        btn.onclick = () => { currentFilter = value; render(); };
         box.appendChild(btn);
-      });
+      }
+
+      addChip('ALL', '全部');
+
+      if (currentMode === '教材模式') {
+        // 章节芯片
+        const chapters = new Set();
+        modeItems.forEach(q => {
+          const m = q.kp_id && q.kp_id.match(/^(ma-c\d+)/);
+          if (m) chapters.add(m[1]);
+        });
+        const sorted = [...chapters].sort(byNumericSuffix);
+        sorted.forEach(cid => {
+          const node = findNode(cid);
+          const short = node ? (node.title.split(/\s+/)[0] || node.title) : cid;
+          addChip(cid, short);
+        });
+      } else {
+        // 话题标签芯片（真题模式）
+        const tagSet = new Set();
+        modeItems.forEach(q => (q.tags || []).forEach(t => tagSet.add(t)));
+        [...tagSet].forEach(tag => addChip(tag, tag));
+      }
     }
 
     function renderCards() {
       let items = currentMode
         ? mathQuestionBank.filter(q => q.source === currentMode)
         : mathQuestionBank.slice();
+
       if (currentFilter !== 'ALL') {
-        items = items.filter(q => Array.isArray(q.tags) && q.tags.includes(currentFilter));
+        if (currentMode === '教材模式') {
+          items = items.filter(q => q.kp_id && q.kp_id.startsWith(currentFilter + '-'));
+        } else {
+          items = items.filter(q => Array.isArray(q.tags) && q.tags.includes(currentFilter));
+        }
       }
-      const grid = document.getElementById('card-grid');
-      grid.innerHTML = '';
+
+      const root = document.getElementById('card-grid');
+      root.innerHTML = '';
+      root.className = '';
+
       if (items.length === 0) {
-        grid.innerHTML = '<div class="empty">暂无题目 — 该分类尚未录入题库。</div>';
+        root.innerHTML = '<div class="empty">暂无题目 — 该分类尚未录入题库。</div>';
         return;
       }
-      items.forEach(q => grid.appendChild(buildCardWrap(q)));
+
+      if (currentMode === '教材模式') {
+        renderGroupedByChapter(items, root);
+      } else {
+        const grid = document.createElement('div');
+        grid.className = 'card-grid';
+        items.forEach(q => grid.appendChild(buildCardWrap(q)));
+        root.appendChild(grid);
+      }
+    }
+
+    function renderGroupedByChapter(items, root) {
+      // 先按章 -> 节聚合
+      const byChapter = new Map();
+      items.forEach(q => {
+        const m = q.kp_id && q.kp_id.match(/^(ma-c\d+)-(s\d+)/);
+        if (!m) return;
+        const chId = m[1];
+        const secId = `${m[1]}-${m[2]}`;
+        if (!byChapter.has(chId)) byChapter.set(chId, new Map());
+        const secMap = byChapter.get(chId);
+        if (!secMap.has(secId)) secMap.set(secId, []);
+        secMap.get(secId).push(q);
+      });
+
+      const sortedChapters = [...byChapter.keys()].sort(byNumericSuffix);
+      sortedChapters.forEach(chId => {
+        const chapterTitle = (findNode(chId) && findNode(chId).title) || chId;
+        const chapterEl = document.createElement('section');
+        chapterEl.className = 'chapter-group';
+        chapterEl.innerHTML = `<h2 class="chapter-title">${chapterTitle}</h2>`;
+
+        const secMap = byChapter.get(chId);
+        const sortedSections = [...secMap.keys()].sort(byNumericSuffix);
+        sortedSections.forEach(secId => {
+          const sectionTitle = (findNode(secId) && findNode(secId).title) || secId;
+          const secItems = secMap.get(secId);
+
+          const secEl = document.createElement('div');
+          secEl.className = 'section-group';
+          secEl.innerHTML = `
+            <h3 class="section-title">
+              <span class="section-bar"></span>
+              <span>${sectionTitle}</span>
+              <span class="section-count">${secItems.length} 题</span>
+            </h3>
+          `;
+          const grid = document.createElement('div');
+          grid.className = 'card-grid';
+          secItems.forEach(q => grid.appendChild(buildCardWrap(q)));
+          secEl.appendChild(grid);
+          chapterEl.appendChild(secEl);
+        });
+
+        root.appendChild(chapterEl);
+      });
+    }
+
+    // 从 mathKnowledgeTree 按 id 查找节点（取 title）
+    function findNode(id) {
+      if (typeof mathKnowledgeTree === 'undefined') return null;
+      function walk(node) {
+        if (node.id === id) return node;
+        if (node.children) {
+          for (const c of node.children) {
+            const hit = walk(c);
+            if (hit) return hit;
+          }
+        }
+        return null;
+      }
+      for (const root of mathKnowledgeTree) {
+        const hit = walk(root);
+        if (hit) return hit;
+      }
+      return null;
+    }
+
+    // 按 id 中的数字自然排序（ma-c2 < ma-c10；ma-c1-s2 < ma-c1-s10）
+    function byNumericSuffix(a, b) {
+      const numsA = (a.match(/\d+/g) || []).map(Number);
+      const numsB = (b.match(/\d+/g) || []).map(Number);
+      const n = Math.min(numsA.length, numsB.length);
+      for (let i = 0; i < n; i++) {
+        if (numsA[i] !== numsB[i]) return numsA[i] - numsB[i];
+      }
+      return numsA.length - numsB.length;
     }
 
     function buildCardWrap(q) {
