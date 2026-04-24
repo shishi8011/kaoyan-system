@@ -238,29 +238,41 @@
     .card-face {
       position: absolute;
       inset: 0;
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 24px 28px;
+      border: 1px solid transparent;
+      border-radius: 18px;
+      padding: 26px 28px;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
       display: flex;
       flex-direction: column;
       box-shadow:
-        0 3px 6px rgba(108, 132, 117, .14),
-        0 12px 32px rgba(108, 132, 117, .22);
-      transition: border-color .25s var(--ease), box-shadow .25s var(--ease);
+        0 1px 2px rgba(40, 50, 45, .10),                /* 贴地（短硬） */
+        0 3px 6px rgba(108, 132, 117, .14),             /* 近场 */
+        0 12px 28px rgba(108, 132, 117, .20),           /* 中场 */
+        0 32px 64px rgba(108, 132, 117, .24),           /* 远场柔光 */
+        inset 0 1px 0 rgba(255, 255, 255, .65);         /* 顶部内高光 */
+      transition: border-color .3s var(--ease),
+                  box-shadow .3s var(--ease),
+                  transform .3s var(--ease);
     }
     .card-face:hover {
       border-color: var(--accent);
       box-shadow:
-        0 6px 16px rgba(108, 132, 117, .24),
-        0 24px 56px rgba(108, 132, 117, .34);
+        0 2px 3px rgba(40, 50, 45, .12),
+        0 6px 12px rgba(108, 132, 117, .20),
+        0 20px 40px rgba(108, 132, 117, .28),
+        0 48px 84px rgba(108, 132, 117, .34),
+        inset 0 1px 0 rgba(255, 255, 255, .75);
     }
     .card-front,
     .card-back  { cursor: pointer; }
-    .card-front { background: #FCF7EB; }   /* 正面：暖奶白 */
+    .card-front {
+      background: linear-gradient(180deg, #FDF8ED 0%, #F3E5C0 100%);  /* 暖奶白 → 深米黄 */
+      border-color: #EADDB3;
+    }
     .card-back  {
-      background: #EDF3E8;                 /* 背面：浅沙绿 */
+      background: linear-gradient(180deg, #EEF5E5 0%, #C8DCBA 100%);  /* 薄荷 → 深沙绿 */
+      border-color: #B8CFA8;
       transform: rotateY(180deg);
     }
 
