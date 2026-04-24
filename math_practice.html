@@ -203,19 +203,41 @@
       gap: 10px;
     }
 
-    .qcard {
+    /* ── Flip Card Structure ── */
+    .qcard-flip {
+      perspective: 1200px;
+    }
+    .qcard-inner {
+      position: relative;
+      width: 100%;
+      min-height: 320px;
+      transform-style: preserve-3d;
+      transition: transform .65s cubic-bezier(.4, 0, .2, 1);
+    }
+    .qcard-inner.flipped {
+      transform: rotateY(180deg);
+    }
+    .card-face {
+      position: absolute;
+      inset: 0;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 14px;
       padding: 22px 26px;
-      cursor: pointer;
-      transition: box-shadow .2s, border-color .2s;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: border-color .2s, box-shadow .2s;
     }
-    .qcard:hover {
+    .card-face:hover {
       border-color: var(--accent);
       box-shadow: 0 4px 14px rgba(0, 0, 0, .06);
     }
+    .card-front { cursor: pointer; }
+    .card-back  { transform: rotateY(180deg); }
 
+    /* ── Front Face ── */
     .qcard-head {
       display: flex;
       justify-content: space-between;
@@ -244,17 +266,17 @@
       font-size: .74rem;
       font-family: system-ui, sans-serif;
     }
-
     .question {
+      flex: 1;
       font-size: 1rem;
       color: var(--text);
       line-height: 1.85;
-      min-height: 120px;
+      overflow-y: auto;
+      padding-right: 4px;
     }
-
-    .qcard-foot {
-      margin-top: 18px;
-      padding-top: 14px;
+    .flip-hint {
+      margin-top: 16px;
+      padding-top: 12px;
       border-top: 1px solid #F7F5F0;
       text-align: right;
       color: var(--muted);
@@ -262,29 +284,49 @@
       font-family: system-ui, sans-serif;
     }
 
-    .qcard-answer {
-      margin-top: 18px;
-      padding-top: 16px;
-      border-top: 1px dashed var(--card-border);
+    /* ── Back Face ── */
+    .back-answer {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 4px;
       line-height: 1.85;
       color: var(--text-soft);
-      display: none;
       font-size: .95rem;
     }
-    .qcard.revealed .qcard-answer { display: block; }
-    .qcard.revealed .qcard-foot { display: none; }
-
-    .qcard-answer strong { color: var(--accent-dark); }
-    .qcard-answer table {
+    .back-answer strong { color: var(--accent-dark); }
+    .back-answer table {
       border-collapse: collapse;
       margin: 10px 0;
       font-size: .9rem;
     }
-    .qcard-answer th, .qcard-answer td {
+    .back-answer th, .back-answer td {
       border: 1px solid var(--card-border);
       padding: 6px 12px;
     }
-    .qcard-answer th { background: var(--accent-light); color: var(--accent-dark); }
+    .back-answer th { background: var(--accent-light); color: var(--accent-dark); }
+    .question::-webkit-scrollbar,
+    .back-answer::-webkit-scrollbar { width: 6px; }
+    .question::-webkit-scrollbar-thumb,
+    .back-answer::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 3px; }
+
+    .flip-back-btn {
+      margin-top: 14px;
+      padding: 7px 16px;
+      align-self: flex-start;
+      background: var(--accent-light);
+      border: 1px solid var(--accent);
+      color: var(--accent-dark);
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: system-ui, sans-serif;
+      font-size: .82rem;
+      font-weight: 600;
+      transition: background .15s, color .15s;
+    }
+    .flip-back-btn:hover {
+      background: var(--accent);
+      color: #ffffff;
+    }
 
     /* ── Score Row ── */
     .score-row {
@@ -450,9 +492,6 @@
       const wrap = document.createElement('div');
       wrap.className = 'qcard-wrap';
 
-      const card = document.createElement('article');
-      card.className = 'qcard';
-
       const yearBadge = q.year
         ? `<span class="year-badge">${q.year}年</span>`
         : '<span></span>';
@@ -460,32 +499,54 @@
         .map(t => `<span class="tag-chip">${t.startsWith('#') ? t : '#' + t}</span>`)
         .join('');
 
+      const card = document.createElement('article');
+      card.className = 'qcard-flip';
       card.innerHTML = `
-        <div class="qcard-head">
-          ${yearBadge}
-          <div class="qcard-tags">${tagBadges}</div>
+        <div class="qcard-inner">
+          <div class="card-face card-front">
+            <div class="qcard-head">
+              ${yearBadge}
+              <div class="qcard-tags">${tagBadges}</div>
+            </div>
+            <div class="question" data-tex>${q.question || ''}</div>
+            <div class="flip-hint">点击卡片翻面 →</div>
+          </div>
+          <div class="card-face card-back">
+            <div class="back-answer" data-tex>${(q.answer || '').replace(/\n/g, '<br>')}</div>
+            <button class="flip-back-btn" type="button">← 返回题目</button>
+          </div>
         </div>
-        <div class="question" data-tex>${q.question || ''}</div>
-        <div class="qcard-foot">点击查看解答 →</div>
-        <div class="qcard-answer" data-tex>${(q.answer || '').replace(/\n/g, '<br>')}</div>
       `;
 
-      card.onclick = () => {
-        const willReveal = !card.classList.contains('revealed');
-        card.classList.toggle('revealed');
-        if (willReveal && window.renderMathInElement) {
-          renderMathInElement(card.querySelector('.qcard-answer'), {
+      const inner   = card.querySelector('.qcard-inner');
+      const front   = card.querySelector('.card-front');
+      const back    = card.querySelector('.card-back');
+      const backBtn = card.querySelector('.flip-back-btn');
+
+      function renderBackIfNeeded() {
+        if (!back.dataset.rendered && window.renderMathInElement) {
+          renderMathInElement(back.querySelector('.back-answer'), {
             delimiters: [
               { left: '$$', right: '$$', display: true },
               { left: '$',  right: '$',  display: false }
             ],
             throwOnError: false
           });
+          back.dataset.rendered = '1';
         }
-      };
+      }
+
+      front.addEventListener('click', () => {
+        renderBackIfNeeded();
+        inner.classList.add('flipped');
+      });
+      backBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        inner.classList.remove('flipped');
+      });
 
       if (window.renderMathInElement) {
-        renderMathInElement(card.querySelector('.question'), {
+        renderMathInElement(front.querySelector('.question'), {
           delimiters: [
             { left: '$$', right: '$$', display: true },
             { left: '$',  right: '$',  display: false }
