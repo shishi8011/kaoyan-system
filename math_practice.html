@@ -15,6 +15,11 @@
   <script src="math_data.js"></script>
   <script src="math_practice.js"></script>
 
+  <!-- 精修：中文衬线 + 英文等宽 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap">
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -37,31 +42,39 @@
       --score-yellow-t: #9a7a2a;
       --score-pink:   #f5c8c8;
       --score-pink-t: #a04040;
+      --font-serif:   'Noto Serif SC', 'Songti SC', 'Georgia', serif;
+      --font-sans:    'Inter', system-ui, -apple-system, 'PingFang SC', sans-serif;
+      --shadow-sm:    0 1px 2px rgba(40, 50, 45, .04);
+      --shadow-md:    0 2px 4px rgba(40, 50, 45, .04), 0 8px 20px rgba(40, 50, 45, .06);
+      --shadow-lg:    0 4px 8px rgba(40, 50, 45, .06), 0 16px 32px rgba(108, 132, 117, .14);
+      --ease:         cubic-bezier(.4, 0, .2, 1);
     }
 
     html, body { height: 100%; }
     body {
-      font-family: 'Noto Serif SC', 'Georgia', serif;
+      font-family: var(--font-serif);
       background: var(--bg);
       color: var(--text);
       display: flex;
       flex-direction: column;
       min-height: 100vh;
       line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     /* ── Top Header ── */
     .topnav {
-      background: var(--header-bg);
+      background: linear-gradient(180deg, var(--header-bg) 0%, #5d7867 100%);
       color: var(--header-text);
-      padding: 14px 32px;
+      padding: 16px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+      box-shadow: 0 1px 0 rgba(0, 0, 0, .04), 0 6px 20px rgba(90, 116, 104, .18);
     }
     .brand {
       display: flex;
@@ -77,7 +90,7 @@
       align-items: center;
       justify-content: center;
       font-size: 1.5rem;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, .1);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, .14), inset 0 1px 0 rgba(255, 255, 255, .6);
     }
     .brand-text {
       font-size: 1.25rem;
@@ -100,18 +113,20 @@
       gap: 14px;
     }
     .nav-btn {
-      color: rgba(255, 255, 255, .85);
+      color: rgba(255, 255, 255, .88);
       text-decoration: none;
       border: 1px solid rgba(255, 255, 255, .25);
-      padding: 6px 14px;
-      border-radius: 6px;
+      padding: 7px 15px;
+      border-radius: 8px;
       font-size: .78rem;
-      font-family: system-ui, sans-serif;
-      transition: background .15s, border-color .15s;
+      font-family: var(--font-sans);
+      font-weight: 500;
+      letter-spacing: .02em;
+      transition: all .25s var(--ease);
     }
     .nav-btn:hover {
-      background: rgba(255, 255, 255, .15);
-      border-color: rgba(255, 255, 255, .45);
+      background: rgba(255, 255, 255, .18);
+      border-color: rgba(255, 255, 255, .5);
     }
     .sigma {
       font-size: 2.4rem;
@@ -140,7 +155,7 @@
       width: fit-content;
       margin: 0 auto 22px;
       border: 1px solid var(--card-border);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+      box-shadow: var(--shadow-md);
     }
     .mode-tab {
       padding: 9px 24px;
@@ -148,16 +163,17 @@
       background: transparent;
       border-radius: 10px;
       cursor: pointer;
-      font-family: system-ui, sans-serif;
+      font-family: var(--font-sans);
       font-size: .92rem;
       color: var(--text-soft);
       font-weight: 600;
-      transition: all .2s;
+      transition: all .25s var(--ease);
     }
     .mode-tab:hover { color: var(--accent); }
     .mode-tab.active {
       background: var(--accent);
       color: #ffffff;
+      box-shadow: 0 2px 10px rgba(108, 132, 117, .3);
     }
 
     /* ── Filter Chips ── */
@@ -175,10 +191,10 @@
       color: var(--accent-dark);
       border: 1px solid transparent;
       cursor: pointer;
-      font-family: system-ui, sans-serif;
+      font-family: var(--font-sans);
       font-size: .82rem;
       font-weight: 500;
-      transition: all .15s;
+      transition: all .2s var(--ease);
     }
     .chip:hover {
       background: #d4e4d4;
@@ -188,6 +204,7 @@
       background: var(--accent);
       color: #ffffff;
       border-color: var(--accent);
+      box-shadow: 0 3px 10px rgba(108, 132, 117, .28);
     }
 
     /* ── Card Grid ── */
@@ -223,17 +240,18 @@
       inset: 0;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 14px;
-      padding: 22px 26px;
+      border-radius: 16px;
+      padding: 24px 28px;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
       display: flex;
       flex-direction: column;
-      transition: border-color .2s, box-shadow .2s;
+      box-shadow: var(--shadow-sm);
+      transition: border-color .25s var(--ease), box-shadow .25s var(--ease);
     }
     .card-face:hover {
       border-color: var(--accent);
-      box-shadow: 0 4px 14px rgba(0, 0, 0, .06);
+      box-shadow: var(--shadow-lg);
     }
     .card-front,
     .card-back  { cursor: pointer; }
@@ -249,14 +267,15 @@
       gap: 8px;
     }
     .year-badge {
-      background: var(--year-bg);
+      background: linear-gradient(180deg, #F7E9C4 0%, var(--year-bg) 100%);
       color: var(--year-text);
-      padding: 3px 11px;
-      border-radius: 5px;
+      padding: 3px 12px;
+      border-radius: 6px;
       font-size: .78rem;
       font-weight: 700;
       font-family: 'Times New Roman', serif;
       letter-spacing: .02em;
+      box-shadow: inset 0 -1px 0 rgba(160, 128, 64, .08);
     }
     .qcard-tags {
       display: flex;
@@ -264,9 +283,11 @@
       flex-wrap: wrap;
     }
     .tag-chip {
-      color: var(--muted);
-      font-size: .74rem;
-      font-family: system-ui, sans-serif;
+      color: #8a8a7a;
+      font-size: .72rem;
+      font-weight: 500;
+      font-family: var(--font-sans);
+      letter-spacing: .02em;
     }
     .question {
       flex: 1;
@@ -352,46 +373,57 @@
 
     /* ── Chapter / Section Groups (教材模式) ── */
     .chapter-group {
-      margin-bottom: 44px;
+      margin-bottom: 56px;
     }
     .chapter-title {
-      font-family: 'Noto Serif SC', 'Georgia', serif;
-      font-size: 1.32rem;
+      font-family: var(--font-serif);
+      font-size: 1.4rem;
       color: var(--accent-dark);
       font-weight: 700;
-      padding: 8px 0 12px;
-      margin-bottom: 24px;
-      border-bottom: 2px solid var(--accent);
+      padding: 10px 0 14px;
+      margin-bottom: 28px;
       letter-spacing: .04em;
+      position: relative;
+    }
+    .chapter-title::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent) 35%, var(--accent-light) 75%, transparent 100%);
+      border-radius: 2px;
     }
     .section-group {
-      margin-bottom: 32px;
+      margin-bottom: 36px;
     }
     .section-title {
-      font-family: 'Noto Serif SC', 'Georgia', serif;
-      font-size: 1.05rem;
+      font-family: var(--font-serif);
+      font-size: 1.08rem;
       color: var(--accent);
       font-weight: 600;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       letter-spacing: .02em;
     }
     .section-bar {
       display: inline-block;
       width: 4px;
-      height: 18px;
-      background: var(--accent);
+      height: 20px;
+      background: linear-gradient(180deg, var(--accent) 0%, var(--accent-dark) 100%);
       border-radius: 2px;
       flex-shrink: 0;
     }
     .section-count {
       color: var(--muted);
       font-size: .78rem;
-      font-weight: 400;
+      font-weight: 500;
       margin-left: auto;
-      font-family: system-ui, sans-serif;
+      font-family: var(--font-sans);
+      letter-spacing: .03em;
     }
 
     /* ── Score Row ── */
@@ -401,24 +433,28 @@
       gap: 8px;
     }
     .score-btn {
-      padding: 10px;
+      padding: 12px;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
-      font-family: system-ui, sans-serif;
-      font-size: .82rem;
+      font-family: var(--font-sans);
+      font-size: .84rem;
       font-weight: 600;
-      transition: transform .1s, box-shadow .2s;
+      letter-spacing: .03em;
+      transition: transform .2s var(--ease), box-shadow .2s var(--ease);
     }
     .score-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+    }
+    .score-btn:active {
+      transform: translateY(0);
     }
     .score-btn.mint   { background: var(--score-mint);   color: var(--score-mint-t); }
     .score-btn.yellow { background: var(--score-yellow); color: var(--score-yellow-t); }
     .score-btn.pink   { background: var(--score-pink);   color: var(--score-pink-t); }
     .score-btn.selected {
-      box-shadow: inset 0 0 0 2px var(--accent-dark);
+      box-shadow: inset 0 0 0 2px var(--accent-dark), 0 2px 8px rgba(74, 102, 89, .2);
     }
 
     .empty {
