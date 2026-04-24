@@ -238,7 +238,6 @@
     .card-face {
       position: absolute;
       inset: 0;
-      background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 16px;
       padding: 24px 28px;
@@ -246,16 +245,24 @@
       -webkit-backface-visibility: hidden;
       display: flex;
       flex-direction: column;
-      box-shadow: var(--shadow-sm);
+      box-shadow:
+        0 3px 6px rgba(108, 132, 117, .14),
+        0 12px 32px rgba(108, 132, 117, .22);
       transition: border-color .25s var(--ease), box-shadow .25s var(--ease);
     }
     .card-face:hover {
       border-color: var(--accent);
-      box-shadow: var(--shadow-lg);
+      box-shadow:
+        0 6px 16px rgba(108, 132, 117, .24),
+        0 24px 56px rgba(108, 132, 117, .34);
     }
     .card-front,
     .card-back  { cursor: pointer; }
-    .card-back  { transform: rotateY(180deg); }
+    .card-front { background: #FCF7EB; }   /* 正面：暖奶白 */
+    .card-back  {
+      background: #EDF3E8;                 /* 背面：浅沙绿 */
+      transform: rotateY(180deg);
+    }
 
     /* ── Front Face ── */
     .qcard-head {
