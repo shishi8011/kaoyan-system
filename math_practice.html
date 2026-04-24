@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>数学刷题靶场 · 专属版</title>
+  <title>数学 · 数学系考研</title>
 
   <!-- KaTeX 渲染引擎 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
@@ -18,257 +18,350 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg:         #fafafa;
-      --panel:      #ffffff;
-      --border:     #e8e0d0;
-      --border-soft:#f0ebe0;
-      --accent:     #4a6fa5;      /* 柔和学术蓝 */
-      --accent-warm:#5c7a6e;      /* 温润墨绿 */
-      --accent-light:#e8f0ec;
-      --text:       #2c2c2c;
-      --text-soft:  #4a4a4a;
-      --muted:      #7a8591;
-      --chapter:    #5c7a6e;
-      --section:    #4a6fa5;
-      --concept:    #7c5cbf;
-      --theorem:    #b45309;
+      --bg:           #f5f0e8;
+      --header-bg:    #6b8676;
+      --header-text:  rgba(255, 255, 255, .95);
+      --accent:       #5c7a6e;
+      --accent-dark:  #4a6659;
+      --accent-light: #e1ebe1;
+      --card-bg:      #ffffff;
+      --card-border:  #e8e0d0;
+      --text:         #2c2c2c;
+      --text-soft:    #5c5c5c;
+      --muted:        #9a9a8a;
+      --year-bg:      #f5e8c7;
+      --year-text:    #a08040;
+      --score-mint:   #d4ebd4;
+      --score-mint-t: #4a7a4a;
+      --score-yellow: #f5e8b8;
+      --score-yellow-t: #9a7a2a;
+      --score-pink:   #f5c8c8;
+      --score-pink-t: #a04040;
     }
 
     html, body { height: 100%; }
     body {
-      font-family: 'Georgia', 'Noto Serif SC', serif;
+      font-family: 'Noto Serif SC', 'Georgia', serif;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.75;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+      line-height: 1.7;
     }
 
-    /* ── Top Nav ── */
-    nav.topbar {
+    /* ── Top Header ── */
+    .topnav {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 14px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px 28px;
-      background: var(--panel);
-      border-bottom: 1px solid var(--border);
-      position: sticky; top: 0; z-index: 10;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, .03);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
     }
     .brand {
-      color: var(--accent-warm);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .brand .logo {
+      width: 48px;
+      height: 48px;
+      background: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, .1);
+    }
+    .brand-text {
+      font-size: 1.25rem;
       font-weight: 700;
-      font-size: 1.05rem;
-      letter-spacing: .02em;
-      font-family: 'Georgia', serif;
+      letter-spacing: .04em;
+      color: var(--header-text);
     }
     .brand small {
-      color: var(--muted);
+      display: block;
       font-size: .72rem;
-      font-weight: 400;
-      margin-left: 10px;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-    }
-    .nav-links { display: flex; gap: 8px; }
-    .nav-btn {
-      color: var(--text-soft);
-      text-decoration: none;
-      border: 1px solid var(--border);
-      background: var(--panel);
-      padding: 7px 16px;
-      border-radius: 8px;
-      font-size: .85rem;
+      opacity: .75;
       font-family: system-ui, sans-serif;
-      transition: all .2s;
+      font-weight: 400;
+      margin-top: 2px;
+      letter-spacing: .02em;
+    }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .nav-btn {
+      color: rgba(255, 255, 255, .85);
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, .25);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: .78rem;
+      font-family: system-ui, sans-serif;
+      transition: background .15s, border-color .15s;
     }
     .nav-btn:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: var(--accent-light);
+      background: rgba(255, 255, 255, .15);
+      border-color: rgba(255, 255, 255, .45);
+    }
+    .sigma {
+      font-size: 2.4rem;
+      font-family: 'Times New Roman', 'STIX Two Math', serif;
+      font-style: italic;
+      color: rgba(255, 255, 255, .7);
+      margin-left: 6px;
     }
 
     /* ── Main Layout ── */
     main {
       flex: 1;
-      max-width: 880px;
-      margin: 36px auto;
-      padding: 0 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
       width: 100%;
     }
 
-    .status-bar {
+    /* ── Mode Tabs ── */
+    .mode-tabs {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-      color: var(--muted);
-      font-size: .88rem;
-      font-family: system-ui, sans-serif;
+      gap: 4px;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 5px;
+      width: fit-content;
+      margin: 0 auto 22px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
     }
-    .status-bar .count {
-      color: var(--accent-warm);
+    .mode-tab {
+      padding: 9px 24px;
+      border: none;
+      background: transparent;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: system-ui, sans-serif;
+      font-size: .92rem;
+      color: var(--text-soft);
       font-weight: 600;
+      transition: all .2s;
+    }
+    .mode-tab:hover { color: var(--accent); }
+    .mode-tab.active {
+      background: var(--accent);
+      color: #ffffff;
     }
 
-    .filters {
+    /* ── Filter Chips ── */
+    .filter-chips {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 24px;
+      margin-bottom: 28px;
+      justify-content: center;
     }
-    .filter-btn {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      color: var(--text-soft);
-      padding: 7px 16px;
+    .chip {
+      padding: 6px 14px;
       border-radius: 999px;
+      background: var(--accent-light);
+      color: var(--accent-dark);
+      border: 1px solid transparent;
       cursor: pointer;
       font-family: system-ui, sans-serif;
       font-size: .82rem;
-      transition: all .2s;
+      font-weight: 500;
+      transition: all .15s;
     }
-    .filter-btn:hover {
+    .chip:hover {
+      background: #d4e4d4;
       border-color: var(--accent);
-      color: var(--accent);
     }
-    .filter-btn.active {
-      background: var(--accent-warm);
+    .chip.active {
+      background: var(--accent);
       color: #ffffff;
-      border-color: var(--accent-warm);
-    }
-
-    /* ── Question Card ── */
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 28px 32px;
-      margin-bottom: 18px;
-      transition: border-color .2s, box-shadow .2s;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, .03);
-    }
-    .card:hover {
       border-color: var(--accent);
-      box-shadow: 0 4px 14px rgba(74, 111, 165, .08);
     }
 
-    .card-header {
+    /* ── Card Grid ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+      gap: 24px;
+    }
+
+    .qcard-wrap {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
-      padding-bottom: 14px;
-      border-bottom: 1px solid var(--border-soft);
-      flex-wrap: wrap;
+      flex-direction: column;
       gap: 10px;
     }
-    .kp-link {
-      color: var(--accent);
-      font-size: .88rem;
-      font-weight: 700;
-      text-decoration: none;
-      font-family: system-ui, sans-serif;
+
+    .qcard {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 22px 26px;
+      cursor: pointer;
+      transition: box-shadow .2s, border-color .2s;
     }
-    .kp-link:hover { text-decoration: underline; }
-    .source-tag {
-      background: var(--accent-light);
-      color: var(--accent-warm);
-      padding: 3px 12px;
-      border-radius: 999px;
-      font-size: .72rem;
-      font-weight: 700;
-      font-family: system-ui, sans-serif;
-      letter-spacing: .03em;
+    .qcard:hover {
+      border-color: var(--accent);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, .06);
     }
 
-    .question, .answer {
-      line-height: 1.9;
-      font-family: 'Georgia', 'Noto Serif SC', serif;
-      font-size: 1rem;
+    .qcard-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 8px;
     }
-    .question { color: var(--text); }
-    .answer {
+    .year-badge {
+      background: var(--year-bg);
+      color: var(--year-text);
+      padding: 3px 11px;
+      border-radius: 5px;
+      font-size: .78rem;
+      font-weight: 700;
+      font-family: 'Times New Roman', serif;
+      letter-spacing: .02em;
+    }
+    .qcard-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .tag-chip {
+      color: var(--muted);
+      font-size: .74rem;
+      font-family: system-ui, sans-serif;
+    }
+
+    .question {
+      font-size: 1rem;
+      color: var(--text);
+      line-height: 1.85;
+      min-height: 120px;
+    }
+
+    .qcard-foot {
       margin-top: 18px;
-      padding-top: 18px;
-      border-top: 1px dashed var(--border);
+      padding-top: 14px;
+      border-top: 1px solid #f5f0e8;
+      text-align: right;
+      color: var(--muted);
+      font-size: .82rem;
+      font-family: system-ui, sans-serif;
+    }
+
+    .qcard-answer {
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--card-border);
+      line-height: 1.85;
       color: var(--text-soft);
       display: none;
-    }
-    .answer.visible { display: block; }
-    .answer table {
-      border-collapse: collapse;
-      margin: 14px 0;
       font-size: .95rem;
     }
-    .answer th, .answer td {
-      border: 1px solid var(--border);
-      padding: 8px 14px;
-    }
-    .answer th {
-      background: var(--accent-light);
-      color: var(--accent-warm);
-      font-weight: 700;
-    }
-    .answer strong { color: var(--theorem); }
+    .qcard.revealed .qcard-answer { display: block; }
+    .qcard.revealed .qcard-foot { display: none; }
 
-    .reveal-btn {
-      margin-top: 20px;
-      background: var(--accent-light);
-      border: 1px solid var(--accent-warm);
-      color: var(--accent-warm);
-      padding: 9px 22px;
-      border-radius: 8px;
+    .qcard-answer strong { color: var(--accent-dark); }
+    .qcard-answer table {
+      border-collapse: collapse;
+      margin: 10px 0;
+      font-size: .9rem;
+    }
+    .qcard-answer th, .qcard-answer td {
+      border: 1px solid var(--card-border);
+      padding: 6px 12px;
+    }
+    .qcard-answer th { background: var(--accent-light); color: var(--accent-dark); }
+
+    /* ── Score Row ── */
+    .score-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .score-btn {
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
       cursor: pointer;
       font-family: system-ui, sans-serif;
-      font-size: .86rem;
+      font-size: .82rem;
       font-weight: 600;
-      transition: all .2s;
+      transition: transform .1s, box-shadow .2s;
     }
-    .reveal-btn:hover {
-      background: var(--accent-warm);
-      color: #ffffff;
+    .score-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+    }
+    .score-btn.mint   { background: var(--score-mint);   color: var(--score-mint-t); }
+    .score-btn.yellow { background: var(--score-yellow); color: var(--score-yellow-t); }
+    .score-btn.pink   { background: var(--score-pink);   color: var(--score-pink-t); }
+    .score-btn.selected {
+      box-shadow: inset 0 0 0 2px var(--accent-dark);
     }
 
     .empty {
+      grid-column: 1 / -1;
       text-align: center;
       padding: 80px 20px;
       color: var(--muted);
       font-style: italic;
     }
 
-    /* KaTeX 在浅色主题下自动适配 */
     .katex { font-size: 1em; }
+
+    @media (max-width: 720px) {
+      .card-grid { grid-template-columns: 1fr; }
+      .topnav { padding: 12px 18px; }
+      .brand-text { font-size: 1.05rem; }
+      .sigma { font-size: 1.8rem; }
+      .nav-btn { padding: 5px 10px; font-size: .72rem; }
+    }
   </style>
 </head>
 <body>
 
-  <nav class="topbar">
-    <div class="brand">数学刷题靶场 <small>Practice Range · Private</small></div>
-    <div class="nav-links">
-      <a class="nav-btn" href="math.html">📖 知识图谱</a>
-      <a class="nav-btn" href="index.html">↩ 返回中枢</a>
+  <header class="topnav">
+    <div class="brand">
+      <span class="logo">☁</span>
+      <div>
+        <div class="brand-text">数学 · 数学系考研</div>
+        <small>数学分析 · 高等代数 · 考研真题分类</small>
+      </div>
     </div>
-  </nav>
+    <div class="nav-right">
+      <a class="nav-btn" href="math.html">📖 知识图谱</a>
+      <a class="nav-btn" href="index.html">↩ 中枢</a>
+      <span class="sigma">Σ</span>
+    </div>
+  </header>
 
   <main>
-    <div class="status-bar">
-      <div>题库加载状态：<span id="load-status">正在初始化…</span></div>
-      <div>当前题数：<span class="count" id="question-count">0</span></div>
-    </div>
-
-    <div class="filters" id="filters"></div>
-
-    <div id="question-list"></div>
+    <div class="mode-tabs" id="mode-tabs"></div>
+    <div class="filter-chips" id="filter-chips"></div>
+    <div class="card-grid" id="card-grid"></div>
   </main>
 
   <script>
+    const SCORE_KEY = 'math_practice_scores_v1';
+
     let katexReady = false;
-    let dataReady  = false;
+    let currentMode = null;
     let currentFilter = 'ALL';
 
-    window.__katexReady = false;
     Object.defineProperty(window, '__katexReady', {
       set(v) { katexReady = v; tryInit(); },
       get()  { return katexReady; },
@@ -277,92 +370,111 @@
 
     function tryInit() {
       if (!katexReady) return;
-      if (typeof mathQuestionBank === 'undefined' || typeof mathKnowledgeTree === 'undefined') {
-        document.getElementById('load-status').textContent = '数据文件缺失 ✗';
+      if (typeof mathQuestionBank === 'undefined') {
+        document.getElementById('card-grid').innerHTML =
+          '<div class="empty">题库加载失败 ✗</div>';
         return;
       }
-      dataReady = true;
-      document.getElementById('load-status').textContent = '就绪 ✓';
-      renderFilters();
-      renderQuestions();
+      const sources = [...new Set(mathQuestionBank.map(q => q.source).filter(Boolean))];
+      currentMode = currentMode || sources[0] || null;
+      render();
     }
 
-    function kpTitle(kpId) {
-      function walk(node) {
-        if (node.id === kpId) return node.title;
-        if (node.children) for (const c of node.children) {
-          const hit = walk(c);
-          if (hit) return hit;
-        }
-        return null;
-      }
-      for (const root of mathKnowledgeTree) {
-        const hit = walk(root);
-        if (hit) return hit;
-      }
-      return '(未找到知识点)';
+    function render() {
+      renderModeTabs();
+      renderFilterChips();
+      renderCards();
     }
 
-    function renderFilters() {
-      const sources = ['ALL', ...new Set(mathQuestionBank.map(q => q.source).filter(Boolean))];
-      const box = document.getElementById('filters');
+    function renderModeTabs() {
+      const sources = [...new Set(mathQuestionBank.map(q => q.source).filter(Boolean))];
+      const box = document.getElementById('mode-tabs');
       box.innerHTML = '';
-      sources.forEach(s => {
+      if (sources.length === 0) { box.style.display = 'none'; return; }
+      const icons = { '教材模式': '📚', '真题模式': '📖' };
+      sources.forEach(src => {
         const btn = document.createElement('button');
-        btn.className = 'filter-btn' + (s === currentFilter ? ' active' : '');
-        btn.textContent = s === 'ALL' ? '全部' : s;
-        btn.onclick = () => { currentFilter = s; renderFilters(); renderQuestions(); };
+        btn.className = 'mode-tab' + (src === currentMode ? ' active' : '');
+        btn.innerHTML = (icons[src] || '📘') + '&nbsp;' + src;
+        btn.onclick = () => {
+          currentMode = src;
+          currentFilter = 'ALL';
+          render();
+        };
         box.appendChild(btn);
       });
     }
 
-    function renderQuestions() {
-      const list = document.getElementById('question-list');
-      list.innerHTML = '';
+    function renderFilterChips() {
+      const modeItems = currentMode
+        ? mathQuestionBank.filter(q => q.source === currentMode)
+        : mathQuestionBank;
+      const tagSet = new Set();
+      modeItems.forEach(q => {
+        (q.tags || []).forEach(t => tagSet.add(t));
+      });
+      const tags = [...tagSet];
+      const box = document.getElementById('filter-chips');
+      box.innerHTML = '';
+      const all = document.createElement('button');
+      all.className = 'chip' + (currentFilter === 'ALL' ? ' active' : '');
+      all.textContent = '全部';
+      all.onclick = () => { currentFilter = 'ALL'; render(); };
+      box.appendChild(all);
+      tags.forEach(tag => {
+        const btn = document.createElement('button');
+        btn.className = 'chip' + (currentFilter === tag ? ' active' : '');
+        btn.textContent = tag;
+        btn.onclick = () => { currentFilter = tag; render(); };
+        box.appendChild(btn);
+      });
+    }
 
-      const filtered = currentFilter === 'ALL'
-        ? mathQuestionBank
-        : mathQuestionBank.filter(q => q.source === currentFilter);
-
-      document.getElementById('question-count').textContent = filtered.length;
-
-      if (filtered.length === 0) {
-        list.innerHTML = '<div class="empty">暂无题目 — 快去补充题库吧。</div>';
+    function renderCards() {
+      let items = currentMode
+        ? mathQuestionBank.filter(q => q.source === currentMode)
+        : mathQuestionBank.slice();
+      if (currentFilter !== 'ALL') {
+        items = items.filter(q => Array.isArray(q.tags) && q.tags.includes(currentFilter));
+      }
+      const grid = document.getElementById('card-grid');
+      grid.innerHTML = '';
+      if (items.length === 0) {
+        grid.innerHTML = '<div class="empty">暂无题目 — 该分类尚未录入题库。</div>';
         return;
       }
+      items.forEach(q => grid.appendChild(buildCardWrap(q)));
+    }
 
-      filtered.forEach((q, idx) => {
-        const card = document.createElement('article');
-        card.className = 'card';
-        const kpTitleText = q.kp_id ? kpTitle(q.kp_id) : '';
-        card.innerHTML = `
-          <div class="card-header">
-            <a class="kp-link" href="math.html#${q.kp_id || ''}">› ${kpTitleText}</a>
-            <span class="source-tag">${q.source || '未分类'}</span>
-          </div>
-          <div class="question" data-tex>Q${idx + 1}. ${q.question || ''}</div>
-          <button class="reveal-btn">显示答案</button>
-          <div class="answer" data-tex>${(q.answer || '').replace(/\n/g, '<br>')}</div>
-        `;
-        const btn = card.querySelector('.reveal-btn');
-        const ans = card.querySelector('.answer');
-        btn.onclick = () => {
-          ans.classList.toggle('visible');
-          btn.textContent = ans.classList.contains('visible') ? '隐藏答案' : '显示答案';
-          if (ans.classList.contains('visible') && window.renderMathInElement) {
-            renderMathInElement(ans, {
-              delimiters: [
-                { left: '$$', right: '$$', display: true },
-                { left: '$',  right: '$',  display: false }
-              ],
-              throwOnError: false
-            });
-          }
-        };
-        list.appendChild(card);
+    function buildCardWrap(q) {
+      const wrap = document.createElement('div');
+      wrap.className = 'qcard-wrap';
 
-        if (window.renderMathInElement) {
-          renderMathInElement(card.querySelector('.question'), {
+      const card = document.createElement('article');
+      card.className = 'qcard';
+
+      const yearBadge = q.year
+        ? `<span class="year-badge">${q.year}年</span>`
+        : '<span></span>';
+      const tagBadges = (q.tags || [])
+        .map(t => `<span class="tag-chip">${t.startsWith('#') ? t : '#' + t}</span>`)
+        .join('');
+
+      card.innerHTML = `
+        <div class="qcard-head">
+          ${yearBadge}
+          <div class="qcard-tags">${tagBadges}</div>
+        </div>
+        <div class="question" data-tex>${q.question || ''}</div>
+        <div class="qcard-foot">点击查看解答 →</div>
+        <div class="qcard-answer" data-tex>${(q.answer || '').replace(/\n/g, '<br>')}</div>
+      `;
+
+      card.onclick = () => {
+        const willReveal = !card.classList.contains('revealed');
+        card.classList.toggle('revealed');
+        if (willReveal && window.renderMathInElement) {
+          renderMathInElement(card.querySelector('.qcard-answer'), {
             delimiters: [
               { left: '$$', right: '$$', display: true },
               { left: '$',  right: '$',  display: false }
@@ -370,12 +482,60 @@
             throwOnError: false
           });
         }
+      };
+
+      if (window.renderMathInElement) {
+        renderMathInElement(card.querySelector('.question'), {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$',  right: '$',  display: false }
+          ],
+          throwOnError: false
+        });
+      }
+
+      wrap.appendChild(card);
+
+      const scoreRow = document.createElement('div');
+      scoreRow.className = 'score-row';
+      scoreRow.innerHTML = `
+        <button class="score-btn mint"   data-score="3">秒杀 3分</button>
+        <button class="score-btn yellow" data-score="2">瞄眼 2分</button>
+        <button class="score-btn pink"   data-score="1">不会 1分</button>
+      `;
+      const saved = loadScore(q.id);
+      scoreRow.querySelectorAll('.score-btn').forEach(btn => {
+        const s = parseInt(btn.dataset.score, 10);
+        if (saved === s) btn.classList.add('selected');
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          scoreRow.querySelectorAll('.score-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          saveScore(q.id, s);
+        });
       });
+
+      wrap.appendChild(scoreRow);
+      return wrap;
     }
 
-    // 兜底：若 KaTeX 已加载但 tryInit 未触发（脚本顺序竞争）
+    function saveScore(qid, score) {
+      try {
+        const all = JSON.parse(localStorage.getItem(SCORE_KEY) || '{}');
+        all[qid] = score;
+        localStorage.setItem(SCORE_KEY, JSON.stringify(all));
+      } catch (e) {}
+    }
+    function loadScore(qid) {
+      try {
+        const all = JSON.parse(localStorage.getItem(SCORE_KEY) || '{}');
+        return all[qid];
+      } catch (e) { return null; }
+    }
+
+    // 兜底：脚本加载顺序竞争
     window.addEventListener('load', () => {
-      if (typeof renderMathInElement === 'function' && !dataReady) {
+      if (typeof renderMathInElement === 'function' && !katexReady) {
         katexReady = true;
         tryInit();
       }
